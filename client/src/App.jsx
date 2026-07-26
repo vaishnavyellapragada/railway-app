@@ -3,29 +3,30 @@ import React, { useState, useEffect } from "react";
 // ---------- Shared image fallback handler ----------
 const handleImgError = (e) => {
   e.target.style.display = "none";
-  e.target.parentNode.style.background =
-    "linear-gradient(135deg, #1e293b, #2563eb)";
-  e.target.parentNode.style.display = "flex";
-  e.target.parentNode.style.alignItems = "center";
-  e.target.parentNode.style.justifyContent = "center";
+  if (e.target.parentNode) {
+    e.target.parentNode.style.background = "linear-gradient(135deg, #1e293b, #2563eb)";
+    e.target.parentNode.style.display = "flex";
+    e.target.parentNode.style.alignItems = "center";
+    e.target.parentNode.style.justifyContent = "center";
+  }
 };
 
 // ---------- Data ----------
 const heroImages = [
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/ICE_3_Oberhaider-Wald-Tunnel.jpg/800px-ICE_3_Oberhaider-Wald-Tunnel.jpg",
+    url: "https://picsum.photos/id/1025/600/400",
     height: 200,
   },
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Vande_Bharat_Express_at_New_Delhi.jpg/800px-Vande_Bharat_Express_at_New_Delhi.jpg",
+    url: "https://picsum.photos/id/1033/600/400",
     height: 210,
   },
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Passengers_in_train_interior.jpg/800px-Passengers_in_train_interior.jpg",
+    url: "https://picsum.photos/id/1018/600/400",
     height: 210,
   },
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Train_station_platform_passengers.jpg/800px-Train_station_platform_passengers.jpg",
+    url: "https://picsum.photos/id/1043/600/400",
     height: 200,
   },
 ];
@@ -36,28 +37,28 @@ const scenicJourneys = [
     route: "Mumbai → Goa",
     duration: "11h 40m",
     price: "₹850",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/ICE_3_Oberhaider-Wald-Tunnel.jpg/600px-ICE_3_Oberhaider-Wald-Tunnel.jpg",
+    img: "https://picsum.photos/id/1015/600/400",
   },
   {
     name: "Vande Bharat Express",
     route: "Delhi → Varanasi",
     duration: "8h 05m",
     price: "₹1,450",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Vande_Bharat_Express_at_New_Delhi.jpg/600px-Vande_Bharat_Express_at_New_Delhi.jpg",
+    img: "https://picsum.photos/id/1035/600/400",
   },
   {
     name: "Golden Chariot",
     route: "Bengaluru → Hampi",
     duration: "2 nights",
     price: "₹42,000",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Train_at_station_platform.jpg/600px-Train_at_station_platform.jpg",
+    img: "https://picsum.photos/id/1040/600/400",
   },
   {
     name: "Darjeeling Toy Train",
     route: "NJP → Darjeeling",
     duration: "7h 15m",
     price: "₹1,100",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Darjeeling_Himalayan_Railway_Steam_Locomotive.jpg/600px-Darjeeling_Himalayan_Railway_Steam_Locomotive.jpg",
+    img: "https://picsum.photos/id/1050/600/400",
   },
 ];
 
@@ -126,12 +127,23 @@ const features = [
 // ---------- Reusable bits ----------
 function ImageBox({ src, alt, style }) {
   return (
-    <div style={{ borderRadius: 16, overflow: "hidden", ...style }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        minHeight: "160px",
+        borderRadius: "16px",
+        overflow: "hidden",
+        backgroundColor: "#e2e8f0",
+        position: "relative",
+        ...style,
+      }}
+    >
       <img
         src={src}
         alt={alt}
         onError={handleImgError}
-        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 16, display: "block" }}
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
     </div>
   );
