@@ -1,155 +1,182 @@
 import React, { useState, useEffect } from "react";
 
+// ---------- Shared image fallback handler ----------
+const handleImgError = (e) => {
+  e.target.style.display = "none";
+  e.target.parentNode.style.background =
+    "linear-gradient(135deg, #1e293b, #2563eb)";
+  e.target.parentNode.style.display = "flex";
+  e.target.parentNode.style.alignItems = "center";
+  e.target.parentNode.style.justifyContent = "center";
+};
+
+// ---------- Data ----------
+const heroImages = [
+  {
+    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/ICE_3_Oberhaider-Wald-Tunnel.jpg/800px-ICE_3_Oberhaider-Wald-Tunnel.jpg",
+    height: 200,
+  },
+  {
+    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Vande_Bharat_Express_at_New_Delhi.jpg/800px-Vande_Bharat_Express_at_New_Delhi.jpg",
+    height: 210,
+  },
+  {
+    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Passengers_in_train_interior.jpg/800px-Passengers_in_train_interior.jpg",
+    height: 210,
+  },
+  {
+    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Train_station_platform_passengers.jpg/800px-Train_station_platform_passengers.jpg",
+    height: 200,
+  },
+];
+
+const scenicJourneys = [
+  {
+    name: "Mandovi Express",
+    route: "Mumbai → Goa",
+    duration: "11h 40m",
+    price: "₹850",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/ICE_3_Oberhaider-Wald-Tunnel.jpg/600px-ICE_3_Oberhaider-Wald-Tunnel.jpg",
+  },
+  {
+    name: "Vande Bharat Express",
+    route: "Delhi → Varanasi",
+    duration: "8h 05m",
+    price: "₹1,450",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Vande_Bharat_Express_at_New_Delhi.jpg/600px-Vande_Bharat_Express_at_New_Delhi.jpg",
+  },
+  {
+    name: "Golden Chariot",
+    route: "Bengaluru → Hampi",
+    duration: "2 nights",
+    price: "₹42,000",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Train_at_station_platform.jpg/600px-Train_at_station_platform.jpg",
+  },
+  {
+    name: "Darjeeling Toy Train",
+    route: "NJP → Darjeeling",
+    duration: "7h 15m",
+    price: "₹1,100",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Darjeeling_Himalayan_Railway_Steam_Locomotive.jpg/600px-Darjeeling_Himalayan_Railway_Steam_Locomotive.jpg",
+  },
+];
+
+const pnrCards = [
+  {
+    train: "Telangana Express",
+    pnr: "2847 5591 023",
+    coach: "B2",
+    seat: "34",
+    odds: 96,
+    badge: "Confirmed",
+    badgeColor: "#16A34A",
+    badgeBg: "#DCFCE7",
+  },
+  {
+    train: "Vande Bharat Express",
+    pnr: "9013 2246 887",
+    coach: "C1",
+    seat: "12",
+    odds: 88,
+    badge: "Likely to Confirm",
+    badgeColor: "#65A30D",
+    badgeBg: "#ECFCCB",
+  },
+];
+
+const testimonials = [
+  {
+    name: "Ananya R.",
+    role: "Frequent Commuter",
+    quote:
+      "SeatSeek turned my anxious PNR-refreshing habit into a five-second glance. The confirmation odds are scarily accurate.",
+  },
+  {
+    name: "Vikram S.",
+    role: "Weekend Traveler",
+    quote:
+      "The coach finder saved me a frantic sprint down the platform. I knew exactly where B2 would stop before the train even arrived.",
+  },
+  {
+    name: "Meera K.",
+    role: "Family Trip Planner",
+    quote:
+      "Booking scenic routes for the whole family used to be a spreadsheet nightmare. Now it's just a couple of taps.",
+  },
+];
+
+const features = [
+  {
+    icon: "📍",
+    title: "Live Tracking",
+    desc: "Real-time train positions updated every 30 seconds, right down to the platform.",
+  },
+  {
+    icon: "🚉",
+    title: "Coach Finder",
+    desc: "Know exactly where your coach will halt before the train even pulls in.",
+  },
+  {
+    icon: "🎯",
+    title: "PNR Prediction",
+    desc: "Confirmation odds powered by historical booking patterns, not guesswork.",
+  },
+];
+
+// ---------- Reusable bits ----------
+function ImageBox({ src, alt, style }) {
+  return (
+    <div style={{ borderRadius: 16, overflow: "hidden", ...style }}>
+      <img
+        src={src}
+        alt={alt}
+        onError={handleImgError}
+        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 16, display: "block" }}
+      />
+    </div>
+  );
+}
+
+function StarRow() {
+  return (
+    <div style={{ color: "#F59E0B", fontSize: 16, letterSpacing: 2 }}>
+      {"★★★★★"}
+    </div>
+  );
+}
+
 export default function App() {
   const [mode, setMode] = useState("find");
-  const [swapHover, setSwapHover] = useState(false);
-  const [time, setTime] = useState(new Date());
-  const [hoverStates, setHoverStates] = useState({});
+  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
 
-  const setHover = (key, val) =>
-    setHoverStates((prev) => ({ ...prev, [key]: val }));
-
-  const scrollToSearch = () => {
-    document.getElementById("search-container")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const timeString = time.toLocaleTimeString("en-US", {
+  const timeStr = now.toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
   });
 
-  const colors = {
-    bg: "#FAF3E0",
-    card: "#FFFFFF",
-    text: "#1E293B",
-    subtext: "#64748B",
-    primary: "#2563EB",
-    primaryDark: "#1D4ED8",
-    border: "#E7DFCB",
-    accent: "#F59E0B",
+  const scrollToSearch = () => {
+    document.getElementById("search-container")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const routes = [
-    {
-      name: "Vande Bharat Express",
-      desc: "India's fastest semi-high-speed train, connecting major metros in record time.",
-      img: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      name: "Mandovi Express",
-      desc: "A coastal ride hugging the Konkan shoreline with sweeping sea views.",
-      img: "https://images.unsplash.com/photo-1541892079-2470a1332a65?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      name: "Darjeeling Toy Train",
-      desc: "A UNESCO heritage narrow-gauge climb through misty Himalayan foothills.",
-      img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      name: "Golden Chariot",
-      desc: "A luxury heritage journey through South India's royal landmarks.",
-      img: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80",
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: "Ananya R.",
-      quote:
-        "SeatSeek told me my waitlisted ticket would confirm two days before it actually did. Uncannily accurate.",
-      role: "Frequent commuter, Chennai",
-    },
-    {
-      name: "Rohit M.",
-      quote:
-        "The coach position finder saved me a mad dash across the platform. Knew exactly where to stand.",
-      role: "Weekend traveler, Pune",
-    },
-    {
-      name: "Fatima K.",
-      quote:
-        "Clean interface, fast search, and the recent searches panel remembers exactly what I need.",
-      role: "Business traveler, Hyderabad",
-    },
-  ];
-
-  const features = [
-    {
-      title: "Real-Time Tracking",
-      desc: "Live train positions updated every few seconds, straight from the network.",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 7v5l3 3" />
-        </svg>
-      ),
-    },
-    {
-      title: "Seat Confirmation AI",
-      desc: "Our predictor analyzes historical booking patterns to forecast your odds.",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2">
-          <path d="M3 17l6-6 4 4 8-8" />
-          <path d="M14 7h7v7" />
-        </svg>
-      ),
-    },
-    {
-      title: "Coach Position Finder",
-      desc: "See exactly where your coach stops on the platform before you arrive.",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2">
-          <rect x="3" y="7" width="18" height="10" rx="2" />
-          <path d="M7 21l2-4M17 21l-2-4" />
-        </svg>
-      ),
-    },
-  ];
-
-  const pillButtonStyle = (hovered) => ({
-    padding: "10px 22px",
-    borderRadius: "999px",
-    border: "none",
-    fontWeight: 600,
-    fontSize: "14px",
-    cursor: "pointer",
-    transition: "all 0.25s ease",
-    transform: hovered ? "translateY(-3px)" : "translateY(0)",
-  });
-
-  const cardBase = (hovered) => ({
-    backgroundColor: colors.card,
-    borderRadius: "18px",
-    transition: "all 0.25s ease",
-    transform: hovered ? "translateY(-6px)" : "translateY(0)",
-    boxShadow: hovered
-      ? "0 20px 35px rgba(30,41,59,0.14)"
-      : "0 6px 16px rgba(30,41,59,0.06)",
-  });
+  const cardShadow = "0 4px 16px rgba(30, 41, 59, 0.08)";
 
   return (
-    <div style={{ backgroundColor: colors.bg, minHeight: "100vh", width: "100%", color: colors.text }}>
+    <div style={{ backgroundColor: "#FAF3E0", minHeight: "100vh", width: "100vw", color: "#1E293B" }}>
       <style>{`
-        html, body, #root {
-          margin: 0;
-          padding: 0;
-          max-width: none !important;
-          width: 100vw;
-          min-height: 100vh;
-          overflow-x: hidden;
-          background-color: #FAF3E0;
-          font-family: system-ui, -apple-system, sans-serif;
-        }
+        html, body, #root { margin: 0; padding: 0; max-width: none !important; width: 100vw; min-height: 100vh; overflow-x: hidden; background-color: #FAF3E0; font-family: system-ui, -apple-system, sans-serif; }
         * { box-sizing: border-box; }
-        input::placeholder { color: #94A3B8; }
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-thumb { background: #E7DFCB; border-radius: 10px; }
+        button { font-family: inherit; cursor: pointer; }
+        input { font-family: inherit; }
+        .ss-btn-hover:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25); }
+        .ss-card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(30,41,59,0.12); }
+        .ss-scroll::-webkit-scrollbar { height: 8px; }
+        .ss-scroll::-webkit-scrollbar-thumb { background: #E2D5B8; border-radius: 8px; }
       `}</style>
 
       {/* NAVBAR */}
@@ -158,77 +185,62 @@ export default function App() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "20px 48px",
+          padding: "18px 48px",
+          backgroundColor: "#FFFFFF",
+          boxShadow: "0 2px 8px rgba(30,41,59,0.06)",
           position: "sticky",
           top: 0,
-          zIndex: 50,
-          backgroundColor: "rgba(250,243,224,0.85)",
-          backdropFilter: "blur(8px)",
+          zIndex: 100,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-            <rect x="4" y="3" width="16" height="13" rx="4" fill={colors.primary} />
-            <circle cx="8" cy="19" r="1.8" fill={colors.text} />
-            <circle cx="16" cy="19" r="1.8" fill={colors.text} />
-            <rect x="6.5" y="5.5" width="11" height="5" rx="1.5" fill="#FAF3E0" />
-            <path d="M6 16l-2 3M18 16l2 3" stroke={colors.text} strokeWidth="1.4" strokeLinecap="round" />
-          </svg>
-          <span style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.5px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 26 }}>🚆</span>
+          <span style={{ fontWeight: 800, fontSize: 22, color: "#1E293B", letterSpacing: -0.5 }}>
             SeatSeek
           </span>
         </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <span
             style={{
-              padding: "8px 16px",
-              borderRadius: "999px",
-              backgroundColor: colors.card,
-              border: `1px solid ${colors.border}`,
-              fontSize: "13px",
-              fontWeight: 700,
-              cursor: "pointer",
+              backgroundColor: "#FAF3E0",
+              borderRadius: 999,
+              padding: "6px 14px",
+              fontSize: 13,
+              fontWeight: 600,
+              color: "#1E293B",
             }}
           >
             EN
-          </div>
-          <div
-            style={{
-              fontVariantNumeric: "tabular-nums",
-              fontSize: "14px",
-              fontWeight: 600,
-              color: colors.subtext,
-              padding: "8px 14px",
-              borderRadius: "999px",
-              backgroundColor: colors.card,
-              border: `1px solid ${colors.border}`,
-            }}
-          >
-            {timeString}
-          </div>
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "#64748B", fontVariantNumeric: "tabular-nums" }}>
+            {timeStr}
+          </span>
           <button
-            onMouseEnter={() => setHover("login", true)}
-            onMouseLeave={() => setHover("login", false)}
+            className="ss-btn-hover"
             style={{
-              ...pillButtonStyle(hoverStates.login),
-              backgroundColor: "transparent",
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
+              background: "transparent",
+              border: "1px solid #CBD5E1",
+              borderRadius: 10,
+              padding: "9px 18px",
+              fontWeight: 600,
+              fontSize: 14,
+              color: "#1E293B",
+              transition: "all 0.2s ease",
             }}
           >
             Log in
           </button>
           <button
-            onMouseEnter={() => setHover("signup", true)}
-            onMouseLeave={() => setHover("signup", false)}
+            className="ss-btn-hover"
             style={{
-              ...pillButtonStyle(hoverStates.signup),
-              backgroundColor: colors.primary,
-              color: "#fff",
-              boxShadow: hoverStates.signup
-                ? "0 12px 20px rgba(37,99,235,0.35)"
-                : "0 6px 14px rgba(37,99,235,0.2)",
+              background: "#2563EB",
+              border: "none",
+              borderRadius: 10,
+              padding: "9px 18px",
+              fontWeight: 600,
+              fontSize: 14,
+              color: "#FFFFFF",
+              transition: "all 0.2s ease",
             }}
           >
             Sign up
@@ -241,8 +253,10 @@ export default function App() {
         style={{
           display: "grid",
           gridTemplateColumns: "1.1fr 0.9fr",
-          gap: "48px",
-          padding: "40px 48px 60px",
+          gap: 48,
+          padding: "56px 48px",
+          maxWidth: 1320,
+          margin: "0 auto",
           alignItems: "start",
         }}
       >
@@ -250,458 +264,489 @@ export default function App() {
         <div>
           <h1
             style={{
-              fontSize: "48px",
+              fontSize: 44,
               fontWeight: 800,
-              lineHeight: 1.1,
-              color: colors.text,
-              margin: "0 0 28px 0",
-              letterSpacing: "-1px",
+              lineHeight: 1.15,
+              margin: "0 0 24px 0",
+              color: "#1E293B",
+              letterSpacing: -1,
             }}
           >
             Find your next train journey with SeatSeek
           </h1>
 
-          {/* MODE SWITCHER */}
+          {/* Mode tabs */}
           <div
             style={{
               display: "inline-flex",
-              backgroundColor: colors.card,
-              borderRadius: "999px",
-              padding: "6px",
-              border: `1px solid ${colors.border}`,
-              marginBottom: "20px",
+              backgroundColor: "#FFFFFF",
+              borderRadius: 12,
+              padding: 4,
+              marginBottom: 24,
+              boxShadow: cardShadow,
             }}
           >
-            <div
+            <button
               onClick={() => setMode("find")}
               style={{
+                border: "none",
+                borderRadius: 9,
                 padding: "10px 22px",
-                borderRadius: "999px",
                 fontWeight: 700,
-                fontSize: "14px",
-                cursor: "pointer",
-                transition: "all 0.25s ease",
-                backgroundColor: mode === "find" ? colors.primary : "transparent",
-                color: mode === "find" ? "#fff" : colors.subtext,
+                fontSize: 14,
+                backgroundColor: mode === "find" ? "#2563EB" : "transparent",
+                color: mode === "find" ? "#FFFFFF" : "#64748B",
+                transition: "all 0.2s ease",
               }}
             >
               Find Trains
-            </div>
-            <div
+            </button>
+            <button
               onClick={() => setMode("track")}
               style={{
+                border: "none",
+                borderRadius: 9,
                 padding: "10px 22px",
-                borderRadius: "999px",
                 fontWeight: 700,
-                fontSize: "14px",
-                cursor: "pointer",
-                transition: "all 0.25s ease",
-                backgroundColor: mode === "track" ? colors.primary : "transparent",
-                color: mode === "track" ? "#fff" : colors.subtext,
+                fontSize: 14,
+                backgroundColor: mode === "track" ? "#2563EB" : "transparent",
+                color: mode === "track" ? "#FFFFFF" : "#64748B",
+                transition: "all 0.2s ease",
               }}
             >
               Track Train
-            </div>
+            </button>
           </div>
 
-          {/* SEARCH BOX */}
+          {/* Search box */}
           <div
             id="search-container"
             style={{
-              backgroundColor: colors.card,
-              borderRadius: "20px",
-              padding: "24px",
-              boxShadow: "0 10px 30px rgba(30,41,59,0.08)",
-              border: `1px solid ${colors.border}`,
+              backgroundColor: "#FFFFFF",
+              borderRadius: 18,
+              padding: 20,
+              boxShadow: cardShadow,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 20,
+              scrollMarginTop: 100,
             }}
           >
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1 }}>
+                FROM
+              </label>
+              <input
+                defaultValue="New Delhi"
+                style={{
+                  border: "none",
+                  outline: "none",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "#1E293B",
+                  padding: 0,
+                }}
+              />
+            </div>
+
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto 1fr",
+                width: 40,
+                height: 40,
+                minWidth: 40,
+                borderRadius: 999,
+                border: "1px solid #E2E8F0",
+                backgroundColor: "#FFFFFF",
+                display: "flex",
                 alignItems: "center",
-                gap: "12px",
+                justifyContent: "center",
+                fontSize: 16,
+                color: "#2563EB",
+                boxShadow: "0 2px 6px rgba(30,41,59,0.08)",
+                cursor: "pointer",
               }}
             >
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: colors.subtext, textAlign: "left", marginBottom: "6px" }}>
-                  FROM
-                </div>
-                <input
-                  type="text"
-                  placeholder="Hyderabad (HYB)"
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    outline: "none",
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    color: colors.text,
-                    textAlign: "left",
-                    backgroundColor: "transparent",
-                  }}
-                />
-              </div>
-
-              <button
-                onMouseEnter={() => setSwapHover(true)}
-                onMouseLeave={() => setSwapHover(false)}
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "999px",
-                  backgroundColor: colors.card,
-                  border: `1px solid ${colors.border}`,
-                  boxShadow: "0 4px 10px rgba(30,41,59,0.08)",
-                  cursor: "pointer",
-                  fontSize: "18px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all 0.25s ease",
-                  transform: swapHover ? "rotate(180deg)" : "rotate(0deg)",
-                  color: colors.primary,
-                }}
-              >
-                ⇄
-              </button>
-
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: colors.subtext, textAlign: "left", marginBottom: "6px" }}>
-                  TO
-                </div>
-                <input
-                  type="text"
-                  placeholder="Bengaluru (SBC)"
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    outline: "none",
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    color: colors.text,
-                    textAlign: "left",
-                    backgroundColor: "transparent",
-                  }}
-                />
-              </div>
+              ⇄
             </div>
 
-            <div style={{ height: "1px", backgroundColor: colors.border, margin: "18px 0" }} />
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: "13px", color: colors.subtext, fontWeight: 600 }}>
-                Today · General quota
-              </div>
-              <button
-                onMouseEnter={() => setHover("search", true)}
-                onMouseLeave={() => setHover("search", false)}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1 }}>
+                TO
+              </label>
+              <input
+                defaultValue="Mumbai Central"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 28px",
-                  borderRadius: "14px",
                   border: "none",
-                  backgroundColor: colors.primary,
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: "15px",
-                  cursor: "pointer",
-                  transition: "all 0.25s ease",
-                  transform: hoverStates.search ? "translateY(-4px)" : "translateY(0)",
-                  boxShadow: hoverStates.search
-                    ? "0 16px 28px rgba(37,99,235,0.35)"
-                    : "0 8px 16px rgba(37,99,235,0.22)",
+                  outline: "none",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "#1E293B",
+                  padding: 0,
                 }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="M21 21l-4.35-4.35" />
-                </svg>
-                Search
-              </button>
+              />
             </div>
+
+            <button
+              className="ss-btn-hover"
+              style={{
+                backgroundColor: "#2563EB",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: 12,
+                padding: "14px 28px",
+                fontWeight: 700,
+                fontSize: 15,
+                whiteSpace: "nowrap",
+                transition: "all 0.2s ease",
+              }}
+            >
+              Search
+            </button>
           </div>
 
-          {/* RECENT SEARCHES */}
+          {/* Recent searches */}
           <div
             style={{
-              backgroundColor: colors.card,
-              borderRadius: "18px",
-              padding: "18px 22px",
-              marginTop: "18px",
-              border: `1px solid ${colors.border}`,
+              backgroundColor: "#FFFFFF",
+              borderRadius: 16,
+              padding: 18,
+              boxShadow: cardShadow,
             }}
           >
-            <div style={{ fontSize: "14px", fontWeight: 700, marginBottom: "12px", color: colors.text }}>
-              Recent Searches
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#94A3B8", marginBottom: 12, letterSpacing: 0.5 }}>
+              RECENT SEARCHES
             </div>
             {[
-              "17254 - Guntur Express",
-              "12628 - Karnataka Express",
-            ].map((item, i) => (
+              { code: "17254", name: "Guntur Express" },
+              { code: "12628", name: "Karnataka Express" },
+            ].map((r) => (
               <div
-                key={i}
-                onMouseEnter={() => setHover(`recent${i}`, true)}
-                onMouseLeave={() => setHover(`recent${i}`, false)}
+                key={r.code}
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
                   alignItems: "center",
-                  padding: "10px 8px",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  backgroundColor: hoverStates[`recent${i}`] ? "#FAF3E0" : "transparent",
+                  gap: 12,
+                  padding: "10px 0",
+                  borderTop: "1px solid #F1F5F9",
                 }}
               >
-                <span style={{ fontSize: "14px", fontWeight: 600, color: colors.text }}>{item}</span>
-                <span style={{ color: colors.primary, fontWeight: 700 }}>→</span>
+                <span style={{ fontSize: 18 }}>🚄</span>
+                <span style={{ fontWeight: 600, fontSize: 14, color: "#1E293B" }}>
+                  {r.code} - {r.name}
+                </span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* RIGHT COLUMN — PINTEREST GRID */}
+        {/* RIGHT COLUMN — image grid */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "16px",
-            maxHeight: "480px",
+            gap: 16,
+            maxHeight: 420,
           }}
         >
-          <div style={{ height: "220px", borderRadius: "20px", overflow: "hidden" }}>
-            <img
-              src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80"
-              alt="Passengers on sunlit platform"
-              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "20px" }}
-            />
-          </div>
-          <div style={{ height: "240px", borderRadius: "20px", overflow: "hidden", marginTop: "24px" }}>
-            <img
-              src="https://images.unsplash.com/photo-1541892079-2470a1332a65?auto=format&fit=crop&w=600&q=80"
-              alt="Passenger inside carriage"
-              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "20px" }}
-            />
-          </div>
-          <div style={{ height: "240px", borderRadius: "20px", overflow: "hidden" }}>
-            <img
-              src="https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=600&q=80"
-              alt="Express train on rails"
-              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "20px" }}
-            />
-          </div>
-          <div style={{ height: "220px", borderRadius: "20px", overflow: "hidden", marginTop: "24px" }}>
-            <img
-              src="https://images.unsplash.com/photo-1532105956626-9569c03602f6?auto=format&fit=crop&w=600&q=80"
-              alt="Cozy train interior"
-              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "20px" }}
-            />
-          </div>
+          <ImageBox src={heroImages[0].url} alt="High-speed train" style={{ height: heroImages[0].height }} />
+          <ImageBox src={heroImages[1].url} alt="Vande Bharat Express" style={{ height: heroImages[1].height }} />
+          <ImageBox src={heroImages[2].url} alt="Train interior" style={{ height: heroImages[2].height }} />
+          <ImageBox src={heroImages[3].url} alt="Platform passengers" style={{ height: heroImages[3].height }} />
         </div>
       </section>
 
-      {/* SECTION 1: POPULAR SCENIC ROUTES */}
-      <section style={{ padding: "60px 48px" }}>
-        <h2 style={{ fontSize: "30px", fontWeight: 800, marginBottom: "28px", color: colors.text }}>
-          Popular Scenic Express Routes
+      {/* SECTION 1: Popular Scenic Train Journeys */}
+      <section style={{ padding: "24px 48px", maxWidth: 1320, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20, color: "#1E293B" }}>
+          Popular Scenic Train Journeys
         </h2>
         <div
+          className="ss-scroll"
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "20px",
+            display: "flex",
+            gap: 20,
+            overflowX: "auto",
+            paddingBottom: 12,
           }}
         >
-          {routes.map((r, i) => (
+          {scenicJourneys.map((j) => (
             <div
-              key={i}
-              onMouseEnter={() => setHover(`route${i}`, true)}
-              onMouseLeave={() => setHover(`route${i}`, false)}
+              key={j.name}
+              className="ss-card-hover"
               style={{
-                ...cardBase(hoverStates[`route${i}`]),
+                minWidth: 270,
+                backgroundColor: "#FFFFFF",
+                borderRadius: 16,
                 overflow: "hidden",
+                boxShadow: cardShadow,
+                transition: "all 0.2s ease",
+                position: "relative",
               }}
             >
-              <div style={{ height: "180px", width: "100%", overflow: "hidden" }}>
-                <img
-                  src={r.img}
-                  alt={r.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              <div style={{ position: "relative", height: 160 }}>
+                <ImageBox src={j.img} alt={j.name} style={{ height: 160, borderRadius: 0 }} />
+                <span
+                  style={{
+                    position: "absolute",
+                    top: 12,
+                    right: 12,
+                    backgroundColor: "#2563EB",
+                    color: "#FFFFFF",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    padding: "5px 12px",
+                    borderRadius: 999,
+                    boxShadow: "0 2px 8px rgba(37,99,235,0.4)",
+                  }}
+                >
+                  {j.price}
+                </span>
+              </div>
+              <div style={{ padding: 16 }}>
+                <div style={{ fontWeight: 700, fontSize: 16, color: "#1E293B", marginBottom: 4 }}>
+                  {j.name}
+                </div>
+                <div style={{ fontSize: 13, color: "#64748B", marginBottom: 6 }}>{j.route}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8" }}>⏱ {j.duration}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 2: Live PNR & Seat Availability */}
+      <section style={{ padding: "24px 48px", maxWidth: 1320, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20, color: "#1E293B" }}>
+          Live PNR &amp; Seat Availability
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          {pnrCards.map((p) => (
+            <div
+              key={p.pnr}
+              style={{
+                backgroundColor: "#FFFFFF",
+                borderRadius: 16,
+                padding: 22,
+                boxShadow: cardShadow,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 17, color: "#1E293B" }}>{p.train}</div>
+                  <div style={{ fontSize: 13, color: "#94A3B8", marginTop: 4, letterSpacing: 0.5 }}>
+                    PNR {p.pnr}
+                  </div>
+                </div>
+                <span
+                  style={{
+                    backgroundColor: p.badgeBg,
+                    color: p.badgeColor,
+                    fontWeight: 700,
+                    fontSize: 12,
+                    padding: "6px 12px",
+                    borderRadius: 999,
+                  }}
+                >
+                  {p.badge}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontSize: 14, color: "#64748B" }}>
+                  Coach/Seat: <strong style={{ color: "#1E293B" }}>{p.coach} · Seat {p.seat}</strong>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 600 }}>Confirmation Odds</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: "#2563EB" }}>{p.odds}%</div>
+                </div>
+              </div>
+              <div
+                style={{
+                  marginTop: 12,
+                  height: 8,
+                  backgroundColor: "#F1F5F9",
+                  borderRadius: 999,
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${p.odds}%`,
+                    height: "100%",
+                    backgroundColor: p.badgeColor,
+                    borderRadius: 999,
+                  }}
                 />
               </div>
-              <div style={{ padding: "16px" }}>
-                <div style={{ fontWeight: 700, fontSize: "16px", marginBottom: "6px", color: colors.text }}>
-                  {r.name}
-                </div>
-                <div style={{ fontSize: "13px", color: colors.subtext, lineHeight: 1.5 }}>{r.desc}</div>
-              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* SECTION 2: PNR PREDICTOR */}
-      <section style={{ padding: "20px 48px 60px" }}>
-        <h2 style={{ fontSize: "30px", fontWeight: 800, marginBottom: "28px", color: colors.text }}>
-          Live PNR &amp; Seat Confirmation Predictor
-        </h2>
-        <div
-          onMouseEnter={() => setHover("pnr", true)}
-          onMouseLeave={() => setHover("pnr", false)}
-          style={{
-            ...cardBase(hoverStates.pnr),
-            padding: "32px",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: "24px",
-          }}
-        >
-          {[
-            { label: "Confirmation Chance", value: "92%", color: "#16A34A" },
-            { label: "Waitlist Position", value: "WL 4", color: colors.accent },
-            { label: "Berth Preference Match", value: "Lower", color: colors.primary },
-          ].map((stat, i) => (
-            <div key={i} style={{ textAlign: "center", padding: "12px" }}>
-              <div style={{ fontSize: "32px", fontWeight: 800, color: stat.color, marginBottom: "8px" }}>
-                {stat.value}
-              </div>
-              <div style={{ fontSize: "14px", color: colors.subtext, fontWeight: 600 }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION 3: PLATFORM & COACH FINDER */}
-      <section style={{ padding: "0 48px 60px" }}>
-        <h2 style={{ fontSize: "30px", fontWeight: 800, marginBottom: "28px", color: colors.text }}>
-          Platform &amp; Coach Position Finder
+      {/* SECTION 3: Platform & Coach Finder */}
+      <section style={{ padding: "24px 48px", maxWidth: 1320, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20, color: "#1E293B" }}>
+          Platform &amp; Coach Finder
         </h2>
         <div
           style={{
-            backgroundColor: colors.card,
-            borderRadius: "18px",
-            padding: "32px",
-            border: `1px solid ${colors.border}`,
+            backgroundColor: "#FFFFFF",
+            borderRadius: 16,
+            padding: 28,
+            boxShadow: cardShadow,
           }}
         >
-          <div style={{ fontSize: "14px", color: colors.subtext, marginBottom: "18px", fontWeight: 600 }}>
-            Platform 4 · Entry gate on the left
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}>
+            <span
+              style={{
+                backgroundColor: "#1E293B",
+                color: "#FFFFFF",
+                fontWeight: 700,
+                fontSize: 13,
+                padding: "6px 14px",
+                borderRadius: 8,
+              }}
+            >
+              Platform 4
+            </span>
+            <span style={{ fontSize: 13, color: "#94A3B8" }}>Vande Bharat Express · arriving in 6 min</span>
           </div>
-          <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "8px" }}>
-            {["S1", "S2", "S3", "B1", "B2", "A1", "A2", "H1"].map((coach, i) => (
+
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 10, overflowX: "auto" }}>
+            {["S1", "S2", "A1", "B1", "B2", "B3", "H1"].map((coach) => {
+              const active = coach === "B2";
+              return (
+                <div key={coach} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 64 }}>
+                  {active && <div style={{ fontSize: 18, color: "#2563EB" }}>▼</div>}
+                  <div
+                    style={{
+                      width: 64,
+                      height: active ? 64 : 52,
+                      borderRadius: 12,
+                      backgroundColor: active ? "#2563EB" : "#FAF3E0",
+                      color: active ? "#FFFFFF" : "#1E293B",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                      fontSize: 14,
+                      boxShadow: active ? "0 6px 16px rgba(37,99,235,0.35)" : "none",
+                      border: active ? "none" : "1px solid #EDE4CC",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {coach}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div
+            style={{
+              marginTop: 20,
+              height: 6,
+              borderRadius: 999,
+              background: "repeating-linear-gradient(90deg, #E2D5B8 0, #E2D5B8 10px, transparent 10px, transparent 20px)",
+            }}
+          />
+        </div>
+      </section>
+
+      {/* SECTION 4: Testimonials */}
+      <section style={{ padding: "24px 48px", maxWidth: 1320, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20, color: "#1E293B" }}>
+          User Testimonials
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          {testimonials.map((t) => (
+            <div
+              key={t.name}
+              style={{
+                backgroundColor: "#FFFFFF",
+                borderRadius: 16,
+                padding: 22,
+                boxShadow: cardShadow,
+              }}
+            >
+              <StarRow />
+              <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.6, margin: "14px 0 18px 0" }}>
+                “{t.quote}”
+              </p>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#1E293B" }}>{t.name}</div>
+              <div style={{ fontSize: 12, color: "#94A3B8" }}>{t.role}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 5: Why Choose SeatSeek */}
+      <section style={{ padding: "24px 48px", maxWidth: 1320, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20, color: "#1E293B" }}>
+          Why Choose SeatSeek?
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="ss-card-hover"
+              style={{
+                backgroundColor: "#FFFFFF",
+                borderRadius: 16,
+                padding: 26,
+                boxShadow: cardShadow,
+                transition: "all 0.2s ease",
+              }}
+            >
               <div
-                key={i}
                 style={{
-                  minWidth: "64px",
-                  height: "56px",
-                  borderRadius: "10px",
-                  backgroundColor: i === 4 ? colors.primary : colors.bg,
-                  color: i === 4 ? "#fff" : colors.text,
-                  border: `1px solid ${colors.border}`,
+                  width: 52,
+                  height: 52,
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, #1e293b, #2563eb)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontWeight: 700,
-                  fontSize: "14px",
+                  fontSize: 24,
+                  marginBottom: 16,
                 }}
               >
-                {coach}
+                {f.icon}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 4: WHY CHOOSE SEATSEEK */}
-      <section style={{ padding: "0 48px 60px" }}>
-        <h2 style={{ fontSize: "30px", fontWeight: 800, marginBottom: "28px", color: colors.text }}>
-          Why Choose SeatSeek
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-          {features.map((f, i) => (
-            <div
-              key={i}
-              onMouseEnter={() => setHover(`feat${i}`, true)}
-              onMouseLeave={() => setHover(`feat${i}`, false)}
-              style={{ ...cardBase(hoverStates[`feat${i}`]), padding: "28px" }}
-            >
-              <div style={{ marginBottom: "14px" }}>{f.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: "17px", marginBottom: "8px", color: colors.text }}>
+              <div style={{ fontWeight: 700, fontSize: 17, color: "#1E293B", marginBottom: 8 }}>
                 {f.title}
               </div>
-              <div style={{ fontSize: "14px", color: colors.subtext, lineHeight: 1.5 }}>{f.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION 5: TESTIMONIALS */}
-      <section style={{ padding: "0 48px 70px" }}>
-        <h2 style={{ fontSize: "30px", fontWeight: 800, marginBottom: "28px", color: colors.text }}>
-          Traveler Reviews
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              onMouseEnter={() => setHover(`test${i}`, true)}
-              onMouseLeave={() => setHover(`test${i}`, false)}
-              style={{ ...cardBase(hoverStates[`test${i}`]), padding: "26px" }}
-            >
-              <div style={{ fontSize: "15px", color: colors.text, lineHeight: 1.6, marginBottom: "16px" }}>
-                “{t.quote}”
-              </div>
-              <div style={{ fontWeight: 700, fontSize: "14px", color: colors.text }}>{t.name}</div>
-              <div style={{ fontSize: "13px", color: colors.subtext }}>{t.role}</div>
+              <div style={{ fontSize: 14, color: "#64748B", lineHeight: 1.6 }}>{f.desc}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer
-        style={{
-          backgroundColor: "#1E293B",
-          color: "#F1F5F9",
-          padding: "48px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "20px",
-        }}
-      >
-        <div>
-          <div style={{ fontSize: "20px", fontWeight: 800, marginBottom: "6px" }}>SeatSeek</div>
-          <div style={{ fontSize: "13px", color: "#94A3B8" }}>
-            © {new Date().getFullYear()} SeatSeek. All journeys tracked responsibly.
-          </div>
-        </div>
+      <footer style={{ padding: "48px 48px 40px 48px", textAlign: "center" }}>
         <button
           onClick={scrollToSearch}
-          onMouseEnter={() => setHover("footerCta", true)}
-          onMouseLeave={() => setHover("footerCta", false)}
+          className="ss-btn-hover"
           style={{
-            padding: "16px 32px",
-            borderRadius: "14px",
+            backgroundColor: "#2563EB",
+            color: "#FFFFFF",
             border: "none",
-            backgroundColor: colors.primary,
-            color: "#fff",
+            borderRadius: 14,
+            padding: "16px 36px",
             fontWeight: 700,
-            fontSize: "15px",
-            cursor: "pointer",
-            transition: "all 0.25s ease",
-            transform: hoverStates.footerCta ? "translateY(-4px)" : "translateY(0)",
-            boxShadow: hoverStates.footerCta
-              ? "0 16px 28px rgba(37,99,235,0.4)"
-              : "0 8px 16px rgba(37,99,235,0.25)",
+            fontSize: 16,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+            boxShadow: "0 6px 20px rgba(37,99,235,0.3)",
+            transition: "all 0.2s ease",
+            marginBottom: 24,
           }}
         >
-          Search My Train
+          🔍 Search My Train
         </button>
+        <div style={{ fontSize: 13, color: "#94A3B8" }}>
+          © 2026 SeatSeek | Built for modern rail transit
+        </div>
       </footer>
     </div>
   );
