@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { auth, loginWithGoogle, logoutUser } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 // ---------- Shared image fallback handler ----------
 const handleImgError = (e) => {
@@ -160,6 +162,13 @@ function StarRow() {
 export default function App() {
   const [searchMode, setSearchMode] = useState("find");
   const [now, setNow] = useState(new Date());
+  const [user, setUser] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -174,6 +183,15 @@ export default function App() {
 
   const scrollToSearch = () => {
     document.getElementById("search-container")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+      setIsAuthModalOpen(false);
+    } catch (err) {
+      console.error("Google sign-in failed", err);
+    }
   };
 
   const cardShadow = "0 4px 16px rgba(30, 41, 59, 0.08)";
@@ -228,36 +246,89 @@ export default function App() {
           <span style={{ fontSize: 14, fontWeight: 600, color: "#64748B", fontVariantNumeric: "tabular-nums" }}>
             {timeStr}
           </span>
-          <button
-            className="ss-btn-hover"
-            style={{
-              background: "transparent",
-              border: "1px solid #CBD5E1",
-              borderRadius: 10,
-              padding: "9px 18px",
-              fontWeight: 600,
-              fontSize: 14,
-              color: "#1E293B",
-              transition: "all 0.2s ease",
-            }}
-          >
-            Log in
-          </button>
-          <button
-            className="ss-btn-hover"
-            style={{
-              background: "#2563EB",
-              border: "none",
-              borderRadius: 10,
-              padding: "9px 18px",
-              fontWeight: 600,
-              fontSize: 14,
-              color: "#FFFFFF",
-              transition: "all 0.2s ease",
-            }}
-          >
-            Sign up
-          </button>
+          {user ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || "User"}
+                  onError={handleImgError}
+                  style={{ width: 34, height: 34, borderRadius: 999, objectFit: "cover", display: "block" }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 999,
+                    background: "linear-gradient(135deg, #1e293b, #2563eb)",
+                    color: "#FFFFFF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 700,
+                    fontSize: 14,
+                  }}
+                >
+                  {(user.displayName || user.email || "U").charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span style={{ fontWeight: 600, fontSize: 14, color: "#1E293B", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {user.displayName || user.email}
+              </span>
+              <button
+                className="ss-btn-hover"
+                onClick={() => logoutUser()}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #CBD5E1",
+                  borderRadius: 10,
+                  padding: "9px 18px",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  color: "#1E293B",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Log out
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                className="ss-btn-hover"
+                onClick={() => setIsAuthModalOpen(true)}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #CBD5E1",
+                  borderRadius: 10,
+                  padding: "9px 18px",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  color: "#1E293B",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Log in
+              </button>
+              <button
+                className="ss-btn-hover"
+                onClick={() => setIsAuthModalOpen(true)}
+                style={{
+                  background: "#2563EB",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "9px 18px",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  color: "#FFFFFF",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Sign up
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
@@ -813,6 +884,100 @@ export default function App() {
           © 2026 SeatSeek | Built for modern rail transit
         </div>
       </footer>
+
+      {/* AUTH MODAL */}
+      {isAuthModalOpen && (
+        <div
+          onClick={() => setIsAuthModalOpen(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(15, 23, 42, 0.55)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 20,
+              padding: 32,
+              maxWidth: 400,
+              width: "100%",
+              position: "relative",
+              boxShadow: "0 20px 60px rgba(15,23,42,0.3)",
+            }}
+          >
+            <button
+              onClick={() => setIsAuthModalOpen(false)}
+              aria-label="Close"
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                background: "#F1F5F9",
+                border: "none",
+                borderRadius: 999,
+                width: 32,
+                height: 32,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 14,
+                fontWeight: 700,
+                color: "#64748B",
+              }}
+            >
+              ✕
+            </button>
+
+            <div style={{ textAlign: "center", marginTop: 8 }}>
+              <span style={{ fontSize: 34 }}>🚆</span>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1E293B", margin: "12px 0 8px 0" }}>
+                Welcome to SeatSeek
+              </h2>
+              <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.6, margin: "0 0 24px 0" }}>
+                Sign in to track trains, save favorite routes, and view live PNR updates.
+              </p>
+
+              <button
+                className="ss-btn-hover"
+                onClick={handleGoogleLogin}
+                style={{
+                  width: "100%",
+                  backgroundColor: "#2563EB",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: 12,
+                  padding: "14px 20px",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="#FFFFFF" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.8 2.73v2.27h2.91c1.7-1.57 2.69-3.88 2.69-6.64z" />
+                  <path fill="#FFFFFF" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.27c-.81.54-1.84.86-3.05.86-2.35 0-4.34-1.58-5.05-3.71H.9v2.34C2.38 15.98 5.48 18 9 18z" />
+                  <path fill="#FFFFFF" d="M3.95 10.7c-.18-.54-.28-1.11-.28-1.7s.1-1.16.28-1.7V4.96H.9C.33 6.1 0 7.51 0 9s.33 2.9.9 4.04l3.05-2.34z" />
+                  <path fill="#FFFFFF" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.38 2.02.9 4.96l3.05 2.34C4.66 5.16 6.65 3.58 9 3.58z" />
+                </svg>
+                Continue with Google
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
