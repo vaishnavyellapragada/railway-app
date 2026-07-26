@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // ---------- Inline SVG Icons ----------
 const TrainIcon = ({ size = 28, color = '#2563eb' }) => (
@@ -76,9 +76,32 @@ const ClockIcon = ({ color = '#64748b', size = 15 }) => (
   </svg>
 );
 
+const CheckCircleIcon = ({ color = '#16a34a', size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.8" />
+    <path d="M8 12.5L10.7 15L16 9" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const TrainSideIcon = ({ color = '#2563eb', size = 22 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="7" width="20" height="9" rx="2" stroke={color} strokeWidth="1.6" />
+    <path d="M2 12H22" stroke={color} strokeWidth="1.6" />
+    <circle cx="7" cy="19" r="1.4" fill={color} />
+    <circle cx="17" cy="19" r="1.4" fill={color} />
+  </svg>
+);
+
+const StarIcon = ({ color = '#f59e0b', size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L14.9 8.6L22 9.3L16.7 14.1L18.2 21.2L12 17.6L5.8 21.2L7.3 14.1L2 9.3L9.1 8.6L12 2Z" />
+  </svg>
+);
+
 // ---------- Style Tokens ----------
 const colors = {
   bg: '#FAF3E0',
+  bgAlt: '#F5EBE0',
   card: '#ffffff',
   text: '#1E293B',
   subtext: '#64748b',
@@ -86,6 +109,8 @@ const colors = {
   accentSoft: '#eff4ff',
   border: '#eee3d3',
   pill: '#efe4d3',
+  green: '#16a34a',
+  greenSoft: '#eafaf0',
 };
 
 // Global CSS override injected once — forces html/body/#root to fill the viewport and scroll
@@ -113,6 +138,8 @@ function App() {
   const [hoveredEl, setHoveredEl] = useState(null);
   const [focusedInput, setFocusedInput] = useState(null); // 'from' | 'to' | 'train'
 
+  const searchContainerRef = useRef(null);
+
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
@@ -130,45 +157,83 @@ function App() {
     setToStation(fromStation);
   };
 
+  const scrollToSearch = () => {
+    if (searchContainerRef.current) {
+      const offset = searchContainerRef.current.getBoundingClientRect().top + window.pageYOffset - 100;
+      window.scrollTo({ top: offset, behavior: 'smooth' });
+    }
+  };
+
   const recentSearches = [
     { code: '17254', name: 'Guntur Express' },
     { code: '12628', name: 'Karnataka Express' },
   ];
 
-  // Exactly the three hardcoded, verified image URLs for the hero collage
-  const collageImages = [
-    {
-      url: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=800&auto=format&fit=crop',
-      alt: 'Modern express train on tracks',
+  // Exactly the four hardcoded, verified image URLs for the hero collage
+  const collageImages = {
+    tall: {
+      url: 'https://images.unsplash.com/photo-1541892079-2470a1332a65?q=80&w=800&auto=format&fit=crop',
+      alt: 'A relaxed passenger on a train',
     },
-    {
+    top: {
       url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop',
-      alt: 'Passengers walking on a sunlit railway platform',
+      alt: 'Sunlit passengers on platform',
     },
-    {
+    mid: {
+      url: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=800&auto=format&fit=crop',
+      alt: 'Modern high-speed train',
+    },
+    bottom: {
       url: 'https://images.unsplash.com/photo-1532105956626-9569c03602f6?q=80&w=800&auto=format&fit=crop',
-      alt: 'A traveler looking out a train window',
+      alt: 'Cozy train carriage interior',
     },
-  ];
+  };
 
-  const popularRoutes = [
-    {
-      name: 'Vande Bharat Express',
-      route: 'Delhi → Varanasi',
-      duration: '8h 05m',
-      image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=800&auto=format&fit=crop',
-    },
-    {
-      name: 'Telangana Express',
-      route: 'Hyderabad → New Delhi',
-      duration: '26h 15m',
-      image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop',
-    },
+  const scenicJourneys = [
     {
       name: 'Mandovi Express',
       route: 'Mumbai → Goa',
       duration: '11h 40m',
+      price: '₹850',
+      image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=800&auto=format&fit=crop',
+    },
+    {
+      name: 'Vande Bharat Express',
+      route: 'Delhi → Varanasi',
+      duration: '8h 05m',
+      price: '₹1,450',
+      image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop',
+    },
+    {
+      name: 'Golden Chariot',
+      route: 'Bengaluru → Hampi',
+      duration: '2 nights',
+      price: '₹42,000',
       image: 'https://images.unsplash.com/photo-1532105956626-9569c03602f6?q=80&w=800&auto=format&fit=crop',
+    },
+    {
+      name: 'Darjeeling Toy Train',
+      route: 'NJP → Darjeeling',
+      duration: '7h 15m',
+      price: '₹1,100',
+      image: 'https://images.unsplash.com/photo-1541892079-2470a1332a65?q=80&w=800&auto=format&fit=crop',
+    },
+  ];
+
+  const pnrResults = [
+    {
+      pnr: '2847 5591 023',
+      train: 'Telangana Express',
+      coach: 'B2 · Seat 34',
+      status: 'Confirmed',
+      probability: '96%',
+    },
+    {
+      pnr: '9013 2246 887',
+      train: 'Vande Bharat Express',
+      coach: 'C1 · Seat 12',
+      status: 'Likely to Confirm',
+      probability: '88%',
     },
   ];
 
@@ -189,6 +254,29 @@ function App() {
       desc: 'Smart confirmation-probability forecasts based on historical booking patterns.',
     },
   ];
+
+  const testimonials = [
+    {
+      name: 'Ananya R.',
+      role: 'Frequent Commuter',
+      photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop',
+      quote: 'Knowing exactly where my coach stops on the platform saves me a mad dash every single time.',
+    },
+    {
+      name: 'Vikram S.',
+      role: 'Weekend Traveler',
+      photo: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=200&auto=format&fit=crop',
+      quote: 'The PNR predictor was spot on for my last three trips. Booking decisions feel far less stressful now.',
+    },
+    {
+      name: 'Meera K.',
+      role: 'Family Trip Planner',
+      photo: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=200&auto=format&fit=crop',
+      quote: 'Live tracking meant we timed our arrival perfectly and never stood around waiting in the heat.',
+    },
+  ];
+
+  const platformCoaches = ['S1', 'S2', 'A1', 'B1', 'B2', 'B3', 'H1'];
 
   return (
     <>
@@ -271,7 +359,7 @@ function App() {
             </div>
 
             {/* Search Card */}
-            <div style={styles.searchCard}>
+            <div id="search-container" ref={searchContainerRef} style={styles.searchCard}>
               {activeTab === 'find' ? (
                 <div style={styles.searchRow}>
                   <div
@@ -412,58 +500,148 @@ function App() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN — Pinterest Collage (3 cards, asymmetric) */}
+          {/* RIGHT COLUMN — Asymmetric Pinterest Collage (4 images) */}
           <div style={styles.heroRight}>
             <div style={styles.collageGrid}>
-              <div style={{ ...styles.collageCard, gridColumn: '1', gridRow: '1 / span 2' }}>
-                <img src={collageImages[0].url} alt={collageImages[0].alt} style={styles.collageImg} />
+              {/* Column 1: one tall image spanning both rows */}
+              <div style={{ ...styles.collageCard, gridColumn: '1', gridRow: '1 / span 3' }}>
+                <img src={collageImages.tall.url} alt={collageImages.tall.alt} style={styles.collageImg} />
               </div>
+
+              {/* Column 2: three stacked shorter images */}
               <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '1' }}>
-                <img src={collageImages[1].url} alt={collageImages[1].alt} style={styles.collageImg} />
+                <img src={collageImages.top.url} alt={collageImages.top.alt} style={styles.collageImg} />
               </div>
               <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '2' }}>
-                <img src={collageImages[2].url} alt={collageImages[2].alt} style={styles.collageImg} />
+                <img src={collageImages.mid.url} alt={collageImages.mid.alt} style={styles.collageImg} />
+              </div>
+              <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '3' }}>
+                <img src={collageImages.bottom.url} alt={collageImages.bottom.alt} style={styles.collageImg} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* ---------------- POPULAR ROUTES ---------------- */}
+        {/* ---------------- A. POPULAR SCENIC TRAIN JOURNEYS ---------------- */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Popular Express Routes</h2>
-          <p style={styles.sectionSubtitle}>Frequently searched journeys across the network.</p>
+          <h2 style={styles.sectionTitle}>Popular Scenic Train Journeys</h2>
+          <p style={styles.sectionSubtitle}>Handpicked routes worth the window seat.</p>
 
-          <div style={styles.routeGrid}>
-            {popularRoutes.map((r, idx) => (
+          <div style={styles.scenicGrid}>
+            {scenicJourneys.map((r, idx) => (
               <div
                 key={r.name}
                 style={{
-                  ...styles.routeCard,
-                  ...(hoveredEl === `route-${idx}` ? styles.routeCardHover : {}),
+                  ...styles.scenicCard,
+                  ...(hoveredEl === `scenic-${idx}` ? styles.scenicCardHover : {}),
                 }}
-                onMouseEnter={() => setHoveredEl(`route-${idx}`)}
+                onMouseEnter={() => setHoveredEl(`scenic-${idx}`)}
                 onMouseLeave={() => setHoveredEl(null)}
               >
-                <div style={styles.routeImgWrap}>
-                  <img src={r.image} alt={r.name} style={styles.routeImg} />
+                <div style={styles.scenicImgWrap}>
+                  <img src={r.image} alt={r.name} style={styles.scenicImg} />
+                  <div style={styles.priceBadge}>{r.price}</div>
                 </div>
-                <div style={styles.routeBody}>
+                <div style={styles.scenicBody}>
                   <div style={styles.routeName}>{r.name}</div>
                   <div style={styles.routePath}>{r.route}</div>
                   <div style={styles.routeDuration}>
                     <ClockIcon />
                     <span>{r.duration}</span>
                   </div>
-                  <button
-                    style={{
-                      ...styles.checkSeatsBtn,
-                      ...(hoveredEl === `route-btn-${idx}` ? styles.checkSeatsBtnHover : {}),
-                    }}
-                    onMouseEnter={() => setHoveredEl(`route-btn-${idx}`)}
-                    onMouseLeave={() => setHoveredEl(`route-${idx}`)}
-                  >
-                    Check Seats
-                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------------- B. LIVE PNR & SEAT AVAILABILITY ---------------- */}
+        <section style={{ ...styles.section, backgroundColor: colors.bgAlt }}>
+          <h2 style={styles.sectionTitle}>Live PNR &amp; Seat Availability</h2>
+          <p style={styles.sectionSubtitle}>See exactly how a confirmation forecast looks before you travel.</p>
+
+          <div style={styles.pnrGrid}>
+            {pnrResults.map((p) => (
+              <div key={p.pnr} style={styles.pnrCard}>
+                <div style={styles.pnrTopRow}>
+                  <span style={styles.pnrLabel}>PNR</span>
+                  <span style={styles.pnrValue}>{p.pnr}</span>
+                </div>
+                <div style={styles.pnrTrainRow}>
+                  <TrainSideIcon />
+                  <span style={styles.pnrTrainName}>{p.train}</span>
+                </div>
+                <div style={styles.pnrDetailsRow}>
+                  <div>
+                    <div style={styles.pnrDetailLabel}>Coach / Seat</div>
+                    <div style={styles.pnrDetailValue}>{p.coach}</div>
+                  </div>
+                  <div>
+                    <div style={styles.pnrDetailLabel}>Confirmation Odds</div>
+                    <div style={{ ...styles.pnrDetailValue, color: colors.green }}>{p.probability}</div>
+                  </div>
+                </div>
+                <div style={styles.pnrStatusPill}>
+                  <CheckCircleIcon />
+                  <span>{p.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------------- C. PLATFORM & COACH FINDER ---------------- */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>Platform &amp; Coach Finder</h2>
+          <p style={styles.sectionSubtitle}>
+            See where coach <strong style={{ color: colors.accent }}>B2</strong> will line up on Platform 4 before the train pulls in.
+          </p>
+
+          <div style={styles.platformDiagramCard}>
+            <div style={styles.platformLabelRow}>
+              <span style={styles.platformBadge}>Platform 4</span>
+              <span style={styles.platformDirection}>Train arriving from the North →</span>
+            </div>
+
+            <div style={styles.platformTrack}>
+              {platformCoaches.map((coach) => (
+                <div
+                  key={coach}
+                  style={{
+                    ...styles.coachBlock,
+                    ...(coach === 'B2' ? styles.coachBlockActive : {}),
+                  }}
+                >
+                  {coach}
+                  {coach === 'B2' && <div style={styles.coachPointer} />}
+                </div>
+              ))}
+            </div>
+
+            <div style={styles.platformFootnote}>
+              Stand near the <strong>middle of the platform</strong> — coach B2 stops right where the marker points.
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- D. USER TESTIMONIALS ---------------- */}
+        <section style={{ ...styles.section, backgroundColor: colors.bgAlt }}>
+          <h2 style={styles.sectionTitle}>User Testimonials</h2>
+          <p style={styles.sectionSubtitle}>Real feedback from travelers using SeatSeek every week.</p>
+
+          <div style={styles.testimonialGrid}>
+            {testimonials.map((t) => (
+              <div key={t.name} style={styles.testimonialCard}>
+                <div style={styles.testimonialStars}>
+                  <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
+                </div>
+                <p style={styles.testimonialQuote}>&ldquo;{t.quote}&rdquo;</p>
+                <div style={styles.testimonialPersonRow}>
+                  <img src={t.photo} alt={t.name} style={styles.testimonialPhoto} />
+                  <div>
+                    <div style={styles.testimonialName}>{t.name}</div>
+                    <div style={styles.testimonialRole}>{t.role}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -471,7 +649,7 @@ function App() {
         </section>
 
         {/* ---------------- WHY CHOOSE SEATSEEK ---------------- */}
-        <section style={{ ...styles.section, backgroundColor: '#F5EBE0' }}>
+        <section style={styles.section}>
           <h2 style={styles.sectionTitle}>Why Choose SeatSeek?</h2>
           <p style={styles.sectionSubtitle}>Built to take the guesswork out of every journey.</p>
 
@@ -496,7 +674,19 @@ function App() {
 
         {/* ---------------- FOOTER ---------------- */}
         <footer style={styles.footer}>
-          <span>© 2026 SeatSeek | Built for modern rail transit</span>
+          <button
+            onClick={scrollToSearch}
+            onMouseEnter={() => setHoveredEl('backToSearch')}
+            onMouseLeave={() => setHoveredEl(null)}
+            style={{
+              ...styles.backToSearchBtn,
+              ...(hoveredEl === 'backToSearch' ? styles.backToSearchBtnHover : {}),
+            }}
+          >
+            <SearchIcon size={16} />
+            <span>Search My Train</span>
+          </button>
+          <span style={styles.footerText}>© 2026 SeatSeek | Built for modern rail transit</span>
         </footer>
       </div>
     </>
@@ -827,17 +1017,17 @@ const styles = {
     boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
   },
 
-  // COLLAGE
+  // COLLAGE (asymmetric 4-image grid: 1 tall col + 3 stacked col)
   heroRight: {
     position: 'relative',
     width: '100%',
   },
   collageGrid: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gridTemplateRows: '1fr 1fr',
-    gap: 20,
-    minHeight: 460,
+    gridTemplateColumns: '1.1fr 1fr',
+    gridTemplateRows: 'repeat(3, 1fr)',
+    gap: 18,
+    minHeight: 520,
   },
   collageCard: {
     position: 'relative',
@@ -876,13 +1066,13 @@ const styles = {
     textAlign: 'left',
   },
 
-  // POPULAR ROUTES
-  routeGrid: {
+  // A. SCENIC JOURNEYS
+  scenicGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: 28,
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: 24,
   },
-  routeCard: {
+  scenicCard: {
     backgroundColor: colors.card,
     borderRadius: 22,
     overflow: 'hidden',
@@ -890,32 +1080,45 @@ const styles = {
     boxShadow: '0 10px 26px rgba(30, 41, 59, 0.06)',
     transition: 'all 0.25s ease',
   },
-  routeCardHover: {
+  scenicCardHover: {
     transform: 'translateY(-6px)',
     boxShadow: '0 20px 36px rgba(30, 41, 59, 0.14)',
   },
-  routeImgWrap: {
+  scenicImgWrap: {
     width: '100%',
-    height: 170,
+    height: 150,
+    position: 'relative',
   },
-  routeImg: {
+  scenicImg: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
     display: 'block',
   },
-  routeBody: {
-    padding: '18px 20px 22px',
+  priceBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: colors.accent,
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 800,
+    padding: '5px 12px',
+    borderRadius: 999,
+    boxShadow: '0 6px 14px rgba(37, 99, 235, 0.35)',
+  },
+  scenicBody: {
+    padding: '16px 18px 20px',
     textAlign: 'left',
   },
   routeName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: 800,
     color: '#1E293B',
     marginBottom: 4,
   },
   routePath: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 600,
     color: colors.accent,
     marginBottom: 10,
@@ -927,24 +1130,206 @@ const styles = {
     fontSize: 13,
     color: colors.subtext,
     fontWeight: 600,
-    marginBottom: 16,
   },
-  checkSeatsBtn: {
-    width: '100%',
-    padding: '11px 0',
-    borderRadius: 14,
-    border: 'none',
-    backgroundColor: colors.accent,
-    color: '#fff',
+
+  // B. LIVE PNR
+  pnrGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: 28,
+  },
+  pnrCard: {
+    backgroundColor: colors.card,
+    borderRadius: 22,
+    padding: '24px 26px',
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 10px 26px rgba(30, 41, 59, 0.06)',
+    textAlign: 'left',
+  },
+  pnrTopRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 14,
+  },
+  pnrLabel: {
+    fontSize: 11,
+    fontWeight: 800,
+    color: colors.subtext,
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    backgroundColor: colors.pill,
+    padding: '4px 10px',
+    borderRadius: 999,
+  },
+  pnrValue: {
     fontSize: 14,
     fontWeight: 700,
-    cursor: 'pointer',
-    transition: 'all 0.25s ease',
-    boxShadow: '0 8px 18px rgba(37, 99, 235, 0.22)',
+    color: '#1E293B',
+    letterSpacing: '0.02em',
   },
-  checkSeatsBtnHover: {
-    transform: 'translateY(-3px) scale(1.02)',
-    boxShadow: '0 14px 24px rgba(37, 99, 235, 0.32)',
+  pnrTrainRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 18,
+  },
+  pnrTrainName: {
+    fontSize: 19,
+    fontWeight: 800,
+    color: '#1E293B',
+  },
+  pnrDetailsRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: 18,
+    paddingBottom: 18,
+    borderBottom: `1px solid ${colors.border}`,
+  },
+  pnrDetailLabel: {
+    fontSize: 11,
+    fontWeight: 700,
+    color: colors.subtext,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    marginBottom: 4,
+  },
+  pnrDetailValue: {
+    fontSize: 16,
+    fontWeight: 800,
+    color: '#1E293B',
+  },
+  pnrStatusPill: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.greenSoft,
+    color: colors.green,
+    fontSize: 14,
+    fontWeight: 700,
+    padding: '8px 16px',
+    borderRadius: 999,
+  },
+
+  // C. PLATFORM & COACH FINDER
+  platformDiagramCard: {
+    backgroundColor: colors.card,
+    borderRadius: 24,
+    padding: '32px 36px',
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 10px 26px rgba(30, 41, 59, 0.06)',
+  },
+  platformLabelRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  platformBadge: {
+    backgroundColor: colors.accent,
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 800,
+    padding: '6px 14px',
+    borderRadius: 999,
+  },
+  platformDirection: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: colors.subtext,
+  },
+  platformTrack: {
+    display: 'flex',
+    gap: 10,
+    padding: '20px 0 40px',
+    borderTop: `3px dashed ${colors.border}`,
+    borderBottom: `3px dashed ${colors.border}`,
+    overflowX: 'auto',
+  },
+  coachBlock: {
+    position: 'relative',
+    flex: '1 0 auto',
+    minWidth: 64,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: colors.pill,
+    color: colors.text,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 14,
+    fontWeight: 700,
+  },
+  coachBlockActive: {
+    backgroundColor: colors.accent,
+    color: '#fff',
+    boxShadow: '0 10px 22px rgba(37, 99, 235, 0.35)',
+    transform: 'scale(1.08)',
+  },
+  coachPointer: {
+    position: 'absolute',
+    bottom: -34,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 0,
+    height: 0,
+    borderLeft: '8px solid transparent',
+    borderRight: '8px solid transparent',
+    borderBottom: `10px solid ${colors.accent}`,
+  },
+  platformFootnote: {
+    fontSize: 14,
+    color: colors.subtext,
+    marginTop: 20,
+    textAlign: 'left',
+  },
+
+  // D. TESTIMONIALS
+  testimonialGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: 28,
+  },
+  testimonialCard: {
+    backgroundColor: colors.card,
+    borderRadius: 22,
+    padding: '26px 24px',
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 10px 26px rgba(30, 41, 59, 0.06)',
+    textAlign: 'left',
+  },
+  testimonialStars: {
+    display: 'flex',
+    gap: 3,
+    marginBottom: 14,
+  },
+  testimonialQuote: {
+    fontSize: 15,
+    color: colors.text,
+    lineHeight: 1.6,
+    margin: '0 0 20px',
+  },
+  testimonialPersonRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+  testimonialPhoto: {
+    width: 44,
+    height: 44,
+    borderRadius: '50%',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  testimonialName: {
+    fontSize: 14,
+    fontWeight: 800,
+    color: '#1E293B',
+  },
+  testimonialRole: {
+    fontSize: 12,
+    color: colors.subtext,
+    fontWeight: 600,
   },
 
   // FEATURES
@@ -992,13 +1377,38 @@ const styles = {
   footer: {
     width: '100%',
     boxSizing: 'border-box',
-    padding: '28px 48px',
+    padding: '40px 48px',
     textAlign: 'center',
+    borderTop: `1px solid ${colors.border}`,
+    backgroundColor: colors.card,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 18,
+  },
+  backToSearchBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '14px 28px',
+    borderRadius: 999,
+    border: 'none',
+    backgroundColor: colors.accent,
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: 800,
+    cursor: 'pointer',
+    boxShadow: '0 10px 24px rgba(37, 99, 235, 0.3)',
+    transition: 'all 0.25s ease',
+  },
+  backToSearchBtnHover: {
+    transform: 'translateY(-4px) scale(1.03)',
+    boxShadow: '0 16px 30px rgba(37, 99, 235, 0.4)',
+  },
+  footerText: {
     fontSize: 13,
     fontWeight: 600,
     color: colors.subtext,
-    borderTop: `1px solid ${colors.border}`,
-    backgroundColor: colors.card,
   },
 };
 
