@@ -47,7 +47,7 @@ const ArrowIcon = ({ color = '#2563eb' }) => (
 
 // ---------- Style Tokens ----------
 const colors = {
-  bg: '#F5EBE0',
+  bg: '#FAF3E0',
   card: '#ffffff',
   text: '#1E293B',
   subtext: '#64748b',
@@ -56,6 +56,19 @@ const colors = {
   border: '#eee3d3',
   pill: '#efe4d3',
 };
+
+// Global CSS override injected once — forces html/body/#root to fill the viewport
+const GLOBAL_OVERRIDE_CSS = `
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    max-width: none !important;
+    width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: #FAF3E0;
+  }
+`;
 
 function App() {
   const [activeTab, setActiveTab] = useState('find'); // 'find' | 'track'
@@ -90,264 +103,270 @@ function App() {
     { code: '12628', name: 'Karnataka Express' },
   ];
 
+  // Exactly the three hardcoded, verified image URLs
   const collageImages = [
     {
-      url: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=600&q=80',
-      alt: 'Modern express train speeding on rails',
+      url: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=800&auto=format&fit=crop',
+      alt: 'Traveler waiting on a railway platform',
     },
     {
-      url: 'https://images.unsplash.com/photo-1553773077-0d3d81c3d3b7?w=600&q=80',
-      alt: 'Passenger looking out of a train window',
+      url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop',
+      alt: 'Train arriving at the station',
     },
     {
-      url: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=600&q=80',
-      alt: 'Passenger waiting on a railway platform',
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1600100397608-f256f8e01712?w=600&q=80',
-      alt: 'Cozy train carriage interior',
+      url: 'https://images.unsplash.com/photo-1541892079-2470a1332a65?q=80&w=800&auto=format&fit=crop',
+      alt: 'Passenger travel scene',
     },
   ];
 
   return (
-    <div style={styles.page}>
-      {/* ---------------- NAVBAR ---------------- */}
-      <nav style={styles.navbar}>
-        <div style={styles.brand}>
-          <div style={styles.brandIconWrap}>
-            <TrainIcon size={22} color={colors.accent} />
+    <>
+      <style>{GLOBAL_OVERRIDE_CSS}</style>
+      <div style={styles.page}>
+        {/* ---------------- NAVBAR ---------------- */}
+        <nav style={styles.navbar}>
+          <div style={styles.brand}>
+            <div style={styles.brandIconWrap}>
+              <TrainIcon size={22} color={colors.accent} />
+            </div>
+            <span style={styles.brandName}>SeatSeek</span>
           </div>
-          <span style={styles.brandName}>SeatSeek</span>
-        </div>
 
-        <div style={styles.navRight}>
-          <div style={styles.langPill}>EN</div>
-          <div style={styles.clockPill}>
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{timeString}</span>
-          </div>
-          <button
-            style={{
-              ...styles.loginBtn,
-              ...(hoveredEl === 'login' ? styles.loginBtnHover : {}),
-            }}
-            onMouseEnter={() => setHoveredEl('login')}
-            onMouseLeave={() => setHoveredEl(null)}
-          >
-            Log in
-          </button>
-          <button
-            style={{
-              ...styles.signupBtn,
-              ...(hoveredEl === 'signup' ? styles.signupBtnHover : {}),
-            }}
-            onMouseEnter={() => setHoveredEl('signup')}
-            onMouseLeave={() => setHoveredEl(null)}
-          >
-            Sign up
-          </button>
-        </div>
-      </nav>
-
-      {/* ---------------- HERO ---------------- */}
-      <div style={styles.heroGrid}>
-        {/* LEFT COLUMN */}
-        <div style={styles.heroLeft}>
-          <h1 style={styles.headline}>
-            Find your next train journey <span style={{ color: colors.accent }}>with SeatSeek</span>
-          </h1>
-          <p style={styles.subheadline}>
-            Live running status, seat availability, and platform info — all in one calm, uncluttered place.
-          </p>
-
-          {/* Tab Switcher */}
-          <div style={styles.tabSwitcher}>
+          <div style={styles.navRight}>
+            <div style={styles.langPill}>EN</div>
+            <div style={styles.clockPill}>
+              <span style={{ fontVariantNumeric: 'tabular-nums' }}>{timeString}</span>
+            </div>
             <button
-              onClick={() => setActiveTab('find')}
-              onMouseEnter={() => setHoveredEl('find-tab')}
-              onMouseLeave={() => setHoveredEl(null)}
               style={{
-                ...styles.tabPill,
-                ...(activeTab === 'find' ? styles.tabPillActive : {}),
-                ...(hoveredEl === 'find-tab' && activeTab !== 'find' ? styles.tabPillHover : {}),
+                ...styles.loginBtn,
+                ...(hoveredEl === 'login' ? styles.loginBtnHover : {}),
               }}
+              onMouseEnter={() => setHoveredEl('login')}
+              onMouseLeave={() => setHoveredEl(null)}
             >
-              Find Trains
+              Log in
             </button>
             <button
-              onClick={() => setActiveTab('track')}
-              onMouseEnter={() => setHoveredEl('track-tab')}
-              onMouseLeave={() => setHoveredEl(null)}
               style={{
-                ...styles.tabPill,
-                ...(activeTab === 'track' ? styles.tabPillActive : {}),
-                ...(hoveredEl === 'track-tab' && activeTab !== 'track' ? styles.tabPillHover : {}),
+                ...styles.signupBtn,
+                ...(hoveredEl === 'signup' ? styles.signupBtnHover : {}),
               }}
+              onMouseEnter={() => setHoveredEl('signup')}
+              onMouseLeave={() => setHoveredEl(null)}
             >
-              Track Train
+              Sign up
             </button>
           </div>
+        </nav>
 
-          {/* Search Card */}
-          <div style={styles.searchCard}>
-            {activeTab === 'find' ? (
-              <div style={styles.searchRow}>
-                <div
-                  style={{
-                    ...styles.inputGroup,
-                    ...(focusedInput === 'from' ? styles.inputGroupFocus : {}),
-                  }}
-                >
-                  <PinIcon />
-                  <div style={styles.inputTextWrap}>
-                    <label style={styles.inputLabel}>From</label>
-                    <input
-                      value={fromStation}
-                      onChange={(e) => setFromStation(e.target.value)}
-                      onFocus={() => setFocusedInput('from')}
-                      onBlur={() => setFocusedInput(null)}
-                      placeholder="Departure station"
-                      style={styles.input}
-                    />
+        {/* ---------------- HERO ---------------- */}
+        <div style={styles.heroGrid}>
+          {/* LEFT COLUMN */}
+          <div style={styles.heroLeft}>
+            <h1 style={styles.headline}>
+              Find your next train journey <span style={{ color: colors.accent }}>with SeatSeek</span>
+            </h1>
+            <p style={styles.subheadline}>
+              Live running status, seat availability, and platform info — all in one calm, uncluttered place.
+            </p>
+
+            {/* Tab Switcher */}
+            <div style={styles.tabSwitcher}>
+              <button
+                onClick={() => setActiveTab('find')}
+                onMouseEnter={() => setHoveredEl('find-tab')}
+                onMouseLeave={() => setHoveredEl(null)}
+                style={{
+                  ...styles.tabPill,
+                  ...(activeTab === 'find' ? styles.tabPillActive : {}),
+                  ...(hoveredEl === 'find-tab' && activeTab !== 'find' ? styles.tabPillHover : {}),
+                }}
+              >
+                Find Trains
+              </button>
+              <button
+                onClick={() => setActiveTab('track')}
+                onMouseEnter={() => setHoveredEl('track-tab')}
+                onMouseLeave={() => setHoveredEl(null)}
+                style={{
+                  ...styles.tabPill,
+                  ...(activeTab === 'track' ? styles.tabPillActive : {}),
+                  ...(hoveredEl === 'track-tab' && activeTab !== 'track' ? styles.tabPillHover : {}),
+                }}
+              >
+                Track Train
+              </button>
+            </div>
+
+            {/* Search Card */}
+            <div style={styles.searchCard}>
+              {activeTab === 'find' ? (
+                <div style={styles.searchRow}>
+                  <div
+                    style={{
+                      ...styles.inputGroup,
+                      ...(focusedInput === 'from' ? styles.inputGroupFocus : {}),
+                    }}
+                  >
+                    <PinIcon />
+                    <div style={styles.inputTextWrap}>
+                      <label style={styles.inputLabel}>From</label>
+                      <input
+                        value={fromStation}
+                        onChange={(e) => setFromStation(e.target.value)}
+                        onFocus={() => setFocusedInput('from')}
+                        onBlur={() => setFocusedInput(null)}
+                        placeholder="Departure station"
+                        style={styles.input}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={handleSwap}
-                  onMouseEnter={() => setHoveredEl('swap')}
-                  onMouseLeave={() => setHoveredEl(null)}
-                  style={{
-                    ...styles.swapBtn,
-                    ...(hoveredEl === 'swap' ? styles.swapBtnHover : {}),
-                  }}
-                  aria-label="Swap stations"
-                >
-                  ⇄
-                </button>
+                  <button
+                    onClick={handleSwap}
+                    onMouseEnter={() => setHoveredEl('swap')}
+                    onMouseLeave={() => setHoveredEl(null)}
+                    style={{
+                      ...styles.swapBtn,
+                      ...(hoveredEl === 'swap' ? styles.swapBtnHover : {}),
+                    }}
+                    aria-label="Swap stations"
+                  >
+                    ⇄
+                  </button>
 
-                <div
-                  style={{
-                    ...styles.inputGroup,
-                    ...(focusedInput === 'to' ? styles.inputGroupFocus : {}),
-                  }}
-                >
-                  <FlagIcon />
-                  <div style={styles.inputTextWrap}>
-                    <label style={styles.inputLabel}>To</label>
-                    <input
-                      value={toStation}
-                      onChange={(e) => setToStation(e.target.value)}
-                      onFocus={() => setFocusedInput('to')}
-                      onBlur={() => setFocusedInput(null)}
-                      placeholder="Destination station"
-                      style={styles.input}
-                    />
+                  <div
+                    style={{
+                      ...styles.inputGroup,
+                      ...(focusedInput === 'to' ? styles.inputGroupFocus : {}),
+                    }}
+                  >
+                    <FlagIcon />
+                    <div style={styles.inputTextWrap}>
+                      <label style={styles.inputLabel}>To</label>
+                      <input
+                        value={toStation}
+                        onChange={(e) => setToStation(e.target.value)}
+                        onFocus={() => setFocusedInput('to')}
+                        onBlur={() => setFocusedInput(null)}
+                        placeholder="Destination station"
+                        style={styles.input}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  onMouseEnter={() => setHoveredEl('search')}
-                  onMouseLeave={() => setHoveredEl(null)}
-                  style={{
-                    ...styles.searchBtn,
-                    ...(hoveredEl === 'search' ? styles.searchBtnHover : {}),
-                  }}
-                >
-                  <SearchIcon />
-                  <span>Search</span>
-                </button>
-              </div>
-            ) : (
-              <div style={styles.searchRow}>
-                <div
-                  style={{
-                    ...styles.inputGroup,
-                    flex: 1,
-                    ...(focusedInput === 'train' ? styles.inputGroupFocus : {}),
-                  }}
-                >
-                  <HashIcon />
-                  <div style={styles.inputTextWrap}>
-                    <label style={styles.inputLabel}>Train Number / Name</label>
-                    <input
-                      value={trainNumber}
-                      onChange={(e) => setTrainNumber(e.target.value)}
-                      onFocus={() => setFocusedInput('train')}
-                      onBlur={() => setFocusedInput(null)}
-                      placeholder="e.g. 12628 or Karnataka Express"
-                      style={styles.input}
-                    />
+                  <button
+                    onMouseEnter={() => setHoveredEl('search')}
+                    onMouseLeave={() => setHoveredEl(null)}
+                    style={{
+                      ...styles.searchBtn,
+                      ...(hoveredEl === 'search' ? styles.searchBtnHover : {}),
+                    }}
+                  >
+                    <SearchIcon />
+                    <span>Search</span>
+                  </button>
+                </div>
+              ) : (
+                <div style={styles.searchRow}>
+                  <div
+                    style={{
+                      ...styles.inputGroup,
+                      flex: 1,
+                      ...(focusedInput === 'train' ? styles.inputGroupFocus : {}),
+                    }}
+                  >
+                    <HashIcon />
+                    <div style={styles.inputTextWrap}>
+                      <label style={styles.inputLabel}>Train Number / Name</label>
+                      <input
+                        value={trainNumber}
+                        onChange={(e) => setTrainNumber(e.target.value)}
+                        onFocus={() => setFocusedInput('train')}
+                        onBlur={() => setFocusedInput(null)}
+                        placeholder="e.g. 12628 or Karnataka Express"
+                        style={styles.input}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  onMouseEnter={() => setHoveredEl('search')}
-                  onMouseLeave={() => setHoveredEl(null)}
-                  style={{
-                    ...styles.searchBtn,
-                    ...(hoveredEl === 'search' ? styles.searchBtnHover : {}),
-                  }}
-                >
-                  <SearchIcon />
-                  <span>Track</span>
-                </button>
-              </div>
-            )}
+                  <button
+                    onMouseEnter={() => setHoveredEl('search')}
+                    onMouseLeave={() => setHoveredEl(null)}
+                    style={{
+                      ...styles.searchBtn,
+                      ...(hoveredEl === 'search' ? styles.searchBtnHover : {}),
+                    }}
+                  >
+                    <SearchIcon />
+                    <span>Track</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Recent Searches */}
+            <div style={styles.recentCard}>
+              <div style={styles.recentHeader}>Recent Searches</div>
+              {recentSearches.map((item, idx) => (
+                <div key={item.code} style={styles.recentRow}>
+                  <div style={styles.recentLeft}>
+                    <div style={styles.recentDot} />
+                    <span style={styles.recentText}>
+                      <strong>{item.code}</strong> - {item.name}
+                    </span>
+                  </div>
+                  <button
+                    onMouseEnter={() => setHoveredEl(`recent-${idx}`)}
+                    onMouseLeave={() => setHoveredEl(null)}
+                    style={{
+                      ...styles.recentArrowBtn,
+                      ...(hoveredEl === `recent-${idx}` ? styles.recentArrowBtnHover : {}),
+                    }}
+                    aria-label={`Go to ${item.name}`}
+                  >
+                    <ArrowIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Recent Searches */}
-          <div style={styles.recentCard}>
-            <div style={styles.recentHeader}>Recent Searches</div>
-            {recentSearches.map((item, idx) => (
-              <div key={item.code} style={styles.recentRow}>
-                <div style={styles.recentLeft}>
-                  <div style={styles.recentDot} />
-                  <span style={styles.recentText}>
-                    <strong>{item.code}</strong> - {item.name}
-                  </span>
-                </div>
-                <button
-                  onMouseEnter={() => setHoveredEl(`recent-${idx}`)}
-                  onMouseLeave={() => setHoveredEl(null)}
-                  style={{
-                    ...styles.recentArrowBtn,
-                    ...(hoveredEl === `recent-${idx}` ? styles.recentArrowBtnHover : {}),
-                  }}
-                  aria-label={`Go to ${item.name}`}
-                >
-                  <ArrowIcon />
-                </button>
+          {/* RIGHT COLUMN — Pinterest Collage (3 cards, asymmetric) */}
+          <div style={styles.heroRight}>
+            <div style={styles.collageGrid}>
+              {/* Card 1: tall, spans both rows on the left */}
+              <div style={{ ...styles.collageCard, gridColumn: '1', gridRow: '1 / span 2' }}>
+                <img
+                  src={collageImages[0].url}
+                  alt={collageImages[0].alt}
+                  style={styles.collageImg}
+                />
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* RIGHT COLUMN — Pinterest Collage */}
-        <div style={styles.heroRight}>
-          <div style={styles.collageGrid}>
-            <img
-              src={collageImages[0].url}
-              alt={collageImages[0].alt}
-              style={{ ...styles.collageImg, gridRow: 'span 2', marginTop: 40 }}
-            />
-            <img
-              src={collageImages[1].url}
-              alt={collageImages[1].alt}
-              style={{ ...styles.collageImg, marginTop: 0 }}
-            />
-            <img
-              src={collageImages[2].url}
-              alt={collageImages[2].alt}
-              style={{ ...styles.collageImg, marginTop: 20 }}
-            />
-            <img
-              src={collageImages[3].url}
-              alt={collageImages[3].alt}
-              style={{ ...styles.collageImg, gridRow: 'span 2', marginTop: -20 }}
-            />
+              {/* Card 2: top right */}
+              <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '1', marginTop: 0 }}>
+                <img
+                  src={collageImages[1].url}
+                  alt={collageImages[1].alt}
+                  style={styles.collageImg}
+                />
+              </div>
+
+              {/* Card 3: bottom right */}
+              <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '2', marginTop: 20 }}>
+                <img
+                  src={collageImages[2].url}
+                  alt={collageImages[2].alt}
+                  style={styles.collageImg}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -669,16 +688,25 @@ const styles = {
   collageGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
+    gridTemplateRows: '1fr 1fr',
     gap: 20,
+    minHeight: 460,
+  },
+  collageCard: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
+    overflow: 'hidden',
+    boxShadow: '0 16px 32px rgba(30, 41, 59, 0.12)',
+    backgroundColor: colors.card,
   },
   collageImg: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    borderRadius: 24,
-    boxShadow: '0 16px 32px rgba(30, 41, 59, 0.12)',
+    borderRadius: 'inherit',
     display: 'block',
-    minHeight: 160,
   },
 };
 
