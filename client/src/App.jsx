@@ -158,7 +158,7 @@ function StarRow() {
 }
 
 export default function App() {
-  const [mode, setMode] = useState("find");
+  const [searchMode, setSearchMode] = useState("find");
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -189,6 +189,7 @@ export default function App() {
         .ss-card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(30,41,59,0.12); }
         .ss-scroll::-webkit-scrollbar { height: 8px; }
         .ss-scroll::-webkit-scrollbar-thumb { background: #E2D5B8; border-radius: 8px; }
+        input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important; -webkit-text-fill-color: #1e293b !important; }
       `}</style>
 
       {/* NAVBAR */}
@@ -299,30 +300,30 @@ export default function App() {
             }}
           >
             <button
-              onClick={() => setMode("find")}
+              onClick={() => setSearchMode("find")}
               style={{
                 border: "none",
                 borderRadius: 9,
                 padding: "10px 22px",
                 fontWeight: 700,
                 fontSize: 14,
-                backgroundColor: mode === "find" ? "#2563EB" : "transparent",
-                color: mode === "find" ? "#FFFFFF" : "#64748B",
+                backgroundColor: searchMode === "find" ? "#2563EB" : "transparent",
+                color: searchMode === "find" ? "#FFFFFF" : "#64748B",
                 transition: "all 0.2s ease",
               }}
             >
               Find Trains
             </button>
             <button
-              onClick={() => setMode("track")}
+              onClick={() => setSearchMode("track")}
               style={{
                 border: "none",
                 borderRadius: 9,
                 padding: "10px 22px",
                 fontWeight: 700,
                 fontSize: 14,
-                backgroundColor: mode === "track" ? "#2563EB" : "transparent",
-                color: mode === "track" ? "#FFFFFF" : "#64748B",
+                backgroundColor: searchMode === "track" ? "#2563EB" : "transparent",
+                color: searchMode === "track" ? "#FFFFFF" : "#64748B",
                 transition: "all 0.2s ease",
               }}
             >
@@ -345,76 +346,128 @@ export default function App() {
               scrollMarginTop: 100,
             }}
           >
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1 }}>
-                FROM
-              </label>
-              <input
-                defaultValue="New Delhi"
-                style={{
-                  border: "none",
-                  outline: "none",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#1E293B",
-                  padding: 0,
-                }}
-              />
-            </div>
+            {searchMode === "find" ? (
+              <>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1 }}>
+                    FROM
+                  </label>
+                  <input
+                    defaultValue="New Delhi"
+                    style={{
+                      background: "transparent",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      outline: "none",
+                      color: "#1e293b",
+                      width: "100%",
+                      fontSize: 15,
+                      fontWeight: 600,
+                      padding: 0,
+                    }}
+                  />
+                </div>
 
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                minWidth: 40,
-                borderRadius: 999,
-                border: "1px solid #E2E8F0",
-                backgroundColor: "#FFFFFF",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 16,
-                color: "#2563EB",
-                boxShadow: "0 2px 6px rgba(30,41,59,0.08)",
-                cursor: "pointer",
-              }}
-            >
-              ⇄
-            </div>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    minWidth: 40,
+                    borderRadius: 999,
+                    border: "1px solid #E2E8F0",
+                    backgroundColor: "#FFFFFF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 16,
+                    color: "#2563EB",
+                    boxShadow: "0 2px 6px rgba(30,41,59,0.08)",
+                    cursor: "pointer",
+                  }}
+                >
+                  ⇄
+                </div>
 
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1 }}>
-                TO
-              </label>
-              <input
-                defaultValue="Mumbai Central"
-                style={{
-                  border: "none",
-                  outline: "none",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#1E293B",
-                  padding: 0,
-                }}
-              />
-            </div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1 }}>
+                    TO
+                  </label>
+                  <input
+                    defaultValue="Mumbai Central"
+                    style={{
+                      background: "transparent",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      outline: "none",
+                      color: "#1e293b",
+                      width: "100%",
+                      fontSize: 15,
+                      fontWeight: 600,
+                      padding: 0,
+                    }}
+                  />
+                </div>
 
-            <button
-              className="ss-btn-hover"
-              style={{
-                backgroundColor: "#2563EB",
-                color: "#FFFFFF",
-                border: "none",
-                borderRadius: 12,
-                padding: "14px 28px",
-                fontWeight: 700,
-                fontSize: 15,
-                whiteSpace: "nowrap",
-                transition: "all 0.2s ease",
-              }}
-            >
-              Search
-            </button>
+                <button
+                  className="ss-btn-hover"
+                  style={{
+                    backgroundColor: "#2563EB",
+                    color: "#FFFFFF",
+                    border: "none",
+                    borderRadius: 12,
+                    padding: "14px 28px",
+                    fontWeight: 700,
+                    fontSize: 15,
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  Search
+                </button>
+              </>
+            ) : (
+              <>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1 }}>
+                    TRAIN NUMBER OR NAME
+                  </label>
+                  <input
+                    placeholder="e.g., 17254 or Guntur Express"
+                    style={{
+                      background: "transparent",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      outline: "none",
+                      color: "#1e293b",
+                      width: "100%",
+                      fontSize: 15,
+                      fontWeight: 600,
+                      padding: 0,
+                    }}
+                  />
+                </div>
+
+                <button
+                  className="ss-btn-hover"
+                  style={{
+                    backgroundColor: "#2563EB",
+                    color: "#FFFFFF",
+                    border: "none",
+                    borderRadius: 12,
+                    padding: "14px 28px",
+                    fontWeight: 700,
+                    fontSize: 15,
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s ease",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  📡 Track
+                </button>
+              </>
+            )}
           </div>
 
           {/* Recent searches */}
