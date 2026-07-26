@@ -45,6 +45,37 @@ const ArrowIcon = ({ color = '#2563eb' }) => (
   </svg>
 );
 
+const RadarIcon = ({ color = '#2563eb', size = 26 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.6" />
+    <circle cx="12" cy="12" r="4.5" stroke={color} strokeWidth="1.6" />
+    <circle cx="12" cy="12" r="1.4" fill={color} />
+    <path d="M12 3V1M21 12H23M12 21V23M1 12H3" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+  </svg>
+);
+
+const CoachIcon = ({ color = '#2563eb', size = 26 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="5" width="18" height="12" rx="3" stroke={color} strokeWidth="1.6" />
+    <path d="M7 5V17M12 5V17M17 5V17" stroke={color} strokeWidth="1.6" />
+    <path d="M6 20H8M16 20H18" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+  </svg>
+);
+
+const PredictIcon = ({ color = '#2563eb', size = 26 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 19L9 11L14 15L20 5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M15 5H20V10" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const ClockIcon = ({ color = '#64748b', size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.8" />
+    <path d="M12 7V12L15.5 14" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 // ---------- Style Tokens ----------
 const colors = {
   bg: '#FAF3E0',
@@ -57,7 +88,7 @@ const colors = {
   pill: '#efe4d3',
 };
 
-// Global CSS override injected once — forces html/body/#root to fill the viewport
+// Global CSS override injected once — forces html/body/#root to fill the viewport and scroll
 const GLOBAL_OVERRIDE_CSS = `
   html, body, #root {
     margin: 0;
@@ -66,6 +97,7 @@ const GLOBAL_OVERRIDE_CSS = `
     width: 100vw;
     min-height: 100vh;
     overflow-x: hidden;
+    overflow-y: auto;
     background-color: #FAF3E0;
   }
 `;
@@ -78,7 +110,7 @@ function App() {
   const [now, setNow] = useState(new Date());
 
   // hover / focus state
-  const [hoveredEl, setHoveredEl] = useState(null); // 'search' | 'login' | 'signup' | 'swap' | 'find-tab' | 'track-tab' | 'recent-<idx>'
+  const [hoveredEl, setHoveredEl] = useState(null);
   const [focusedInput, setFocusedInput] = useState(null); // 'from' | 'to' | 'train'
 
   useEffect(() => {
@@ -103,19 +135,58 @@ function App() {
     { code: '12628', name: 'Karnataka Express' },
   ];
 
-  // Exactly the three hardcoded, verified image URLs
+  // Exactly the three hardcoded, verified image URLs for the hero collage
   const collageImages = [
     {
       url: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=800&auto=format&fit=crop',
-      alt: 'Traveler waiting on a railway platform',
+      alt: 'Modern express train on tracks',
     },
     {
       url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop',
-      alt: 'Train arriving at the station',
+      alt: 'Passengers walking on a sunlit railway platform',
     },
     {
-      url: 'https://images.unsplash.com/photo-1541892079-2470a1332a65?q=80&w=800&auto=format&fit=crop',
-      alt: 'Passenger travel scene',
+      url: 'https://images.unsplash.com/photo-1532105956626-9569c03602f6?q=80&w=800&auto=format&fit=crop',
+      alt: 'A traveler looking out a train window',
+    },
+  ];
+
+  const popularRoutes = [
+    {
+      name: 'Vande Bharat Express',
+      route: 'Delhi → Varanasi',
+      duration: '8h 05m',
+      image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=800&auto=format&fit=crop',
+    },
+    {
+      name: 'Telangana Express',
+      route: 'Hyderabad → New Delhi',
+      duration: '26h 15m',
+      image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop',
+    },
+    {
+      name: 'Mandovi Express',
+      route: 'Mumbai → Goa',
+      duration: '11h 40m',
+      image: 'https://images.unsplash.com/photo-1532105956626-9569c03602f6?q=80&w=800&auto=format&fit=crop',
+    },
+  ];
+
+  const features = [
+    {
+      icon: <RadarIcon />,
+      title: 'Live Tracking',
+      desc: 'Real-time GPS position and delay updates for every train, refreshed every minute.',
+    },
+    {
+      icon: <CoachIcon />,
+      title: 'Coach Finder',
+      desc: 'Locate your exact coach position on the platform before the train even arrives.',
+    },
+    {
+      icon: <PredictIcon />,
+      title: 'PNR Prediction',
+      desc: 'Smart confirmation-probability forecasts based on historical booking patterns.',
     },
   ];
 
@@ -233,7 +304,15 @@ function App() {
                     }}
                     aria-label="Swap stations"
                   >
-                    ⇄
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        transition: 'transform 0.35s ease',
+                        transform: hoveredEl === 'swap' ? 'rotate(180deg)' : 'rotate(0deg)',
+                      }}
+                    >
+                      ⇄
+                    </span>
                   </button>
 
                   <div
@@ -336,35 +415,89 @@ function App() {
           {/* RIGHT COLUMN — Pinterest Collage (3 cards, asymmetric) */}
           <div style={styles.heroRight}>
             <div style={styles.collageGrid}>
-              {/* Card 1: tall, spans both rows on the left */}
               <div style={{ ...styles.collageCard, gridColumn: '1', gridRow: '1 / span 2' }}>
-                <img
-                  src={collageImages[0].url}
-                  alt={collageImages[0].alt}
-                  style={styles.collageImg}
-                />
+                <img src={collageImages[0].url} alt={collageImages[0].alt} style={styles.collageImg} />
               </div>
-
-              {/* Card 2: top right */}
-              <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '1', marginTop: 0 }}>
-                <img
-                  src={collageImages[1].url}
-                  alt={collageImages[1].alt}
-                  style={styles.collageImg}
-                />
+              <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '1' }}>
+                <img src={collageImages[1].url} alt={collageImages[1].alt} style={styles.collageImg} />
               </div>
-
-              {/* Card 3: bottom right */}
-              <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '2', marginTop: 20 }}>
-                <img
-                  src={collageImages[2].url}
-                  alt={collageImages[2].alt}
-                  style={styles.collageImg}
-                />
+              <div style={{ ...styles.collageCard, gridColumn: '2', gridRow: '2' }}>
+                <img src={collageImages[2].url} alt={collageImages[2].alt} style={styles.collageImg} />
               </div>
             </div>
           </div>
         </div>
+
+        {/* ---------------- POPULAR ROUTES ---------------- */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>Popular Express Routes</h2>
+          <p style={styles.sectionSubtitle}>Frequently searched journeys across the network.</p>
+
+          <div style={styles.routeGrid}>
+            {popularRoutes.map((r, idx) => (
+              <div
+                key={r.name}
+                style={{
+                  ...styles.routeCard,
+                  ...(hoveredEl === `route-${idx}` ? styles.routeCardHover : {}),
+                }}
+                onMouseEnter={() => setHoveredEl(`route-${idx}`)}
+                onMouseLeave={() => setHoveredEl(null)}
+              >
+                <div style={styles.routeImgWrap}>
+                  <img src={r.image} alt={r.name} style={styles.routeImg} />
+                </div>
+                <div style={styles.routeBody}>
+                  <div style={styles.routeName}>{r.name}</div>
+                  <div style={styles.routePath}>{r.route}</div>
+                  <div style={styles.routeDuration}>
+                    <ClockIcon />
+                    <span>{r.duration}</span>
+                  </div>
+                  <button
+                    style={{
+                      ...styles.checkSeatsBtn,
+                      ...(hoveredEl === `route-btn-${idx}` ? styles.checkSeatsBtnHover : {}),
+                    }}
+                    onMouseEnter={() => setHoveredEl(`route-btn-${idx}`)}
+                    onMouseLeave={() => setHoveredEl(`route-${idx}`)}
+                  >
+                    Check Seats
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------------- WHY CHOOSE SEATSEEK ---------------- */}
+        <section style={{ ...styles.section, backgroundColor: '#F5EBE0' }}>
+          <h2 style={styles.sectionTitle}>Why Choose SeatSeek?</h2>
+          <p style={styles.sectionSubtitle}>Built to take the guesswork out of every journey.</p>
+
+          <div style={styles.featureGrid}>
+            {features.map((f, idx) => (
+              <div
+                key={f.title}
+                style={{
+                  ...styles.featureCard,
+                  ...(hoveredEl === `feature-${idx}` ? styles.featureCardHover : {}),
+                }}
+                onMouseEnter={() => setHoveredEl(`feature-${idx}`)}
+                onMouseLeave={() => setHoveredEl(null)}
+              >
+                <div style={styles.featureIconWrap}>{f.icon}</div>
+                <div style={styles.featureTitle}>{f.title}</div>
+                <div style={styles.featureDesc}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------------- FOOTER ---------------- */}
+        <footer style={styles.footer}>
+          <span>© 2026 SeatSeek | Built for modern rail transit</span>
+        </footer>
       </div>
     </>
   );
@@ -382,6 +515,7 @@ const styles = {
     fontFamily:
       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     boxSizing: 'border-box',
+    overflowY: 'auto',
   },
 
   // NAVBAR
@@ -492,6 +626,7 @@ const styles = {
     letterSpacing: '-0.02em',
     margin: '12px 0 16px',
     color: '#1E293B',
+    textAlign: 'left',
   },
   subheadline: {
     fontSize: 16,
@@ -499,6 +634,7 @@ const styles = {
     lineHeight: 1.6,
     margin: '0 0 28px',
     maxWidth: 460,
+    textAlign: 'left',
   },
 
   // TAB SWITCHER
@@ -556,6 +692,7 @@ const styles = {
     borderRadius: 16,
     border: '1.5px solid transparent',
     transition: 'all 0.25s ease',
+    textAlign: 'left',
   },
   inputGroupFocus: {
     borderColor: colors.accent,
@@ -566,6 +703,8 @@ const styles = {
     flexDirection: 'column',
     minWidth: 0,
     flex: 1,
+    textAlign: 'left',
+    alignItems: 'flex-start',
   },
   inputLabel: {
     fontSize: 11,
@@ -574,6 +713,8 @@ const styles = {
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
     marginBottom: 2,
+    textAlign: 'left',
+    width: '100%',
   },
   input: {
     border: 'none',
@@ -583,13 +724,15 @@ const styles = {
     color: colors.text,
     backgroundColor: 'transparent',
     width: '100%',
+    textAlign: 'left',
+    padding: 0,
   },
   swapBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: '50%',
+    width: 44,
+    height: 34,
+    borderRadius: 999,
     border: `1.5px solid ${colors.border}`,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.card,
     fontSize: 16,
     color: colors.accent,
     cursor: 'pointer',
@@ -598,11 +741,13 @@ const styles = {
     justifyContent: 'center',
     flexShrink: 0,
     transition: 'all 0.25s ease',
+    boxShadow: '0 4px 10px rgba(30, 41, 59, 0.08)',
   },
   swapBtnHover: {
-    transform: 'translateY(-4px) scale(1.1)',
-    boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
+    transform: 'translateY(-3px) scale(1.06)',
+    boxShadow: '0 10px 20px rgba(0,0,0,0.12)',
     backgroundColor: colors.accentSoft,
+    borderColor: colors.accent,
   },
   searchBtn: {
     display: 'flex',
@@ -641,6 +786,7 @@ const styles = {
     textTransform: 'uppercase',
     letterSpacing: '0.06em',
     marginBottom: 10,
+    textAlign: 'left',
   },
   recentRow: {
     display: 'flex',
@@ -662,6 +808,7 @@ const styles = {
   recentText: {
     fontSize: 14,
     color: colors.text,
+    textAlign: 'left',
   },
   recentArrowBtn: {
     width: 30,
@@ -705,8 +852,153 @@ const styles = {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    borderRadius: 'inherit',
     display: 'block',
+  },
+
+  // SECTIONS (shared)
+  section: {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '60px 48px',
+  },
+  sectionTitle: {
+    fontSize: 32,
+    fontWeight: 800,
+    color: '#1E293B',
+    margin: '0 0 8px',
+    textAlign: 'left',
+    letterSpacing: '-0.01em',
+  },
+  sectionSubtitle: {
+    fontSize: 15,
+    color: colors.subtext,
+    margin: '0 0 32px',
+    textAlign: 'left',
+  },
+
+  // POPULAR ROUTES
+  routeGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: 28,
+  },
+  routeCard: {
+    backgroundColor: colors.card,
+    borderRadius: 22,
+    overflow: 'hidden',
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 10px 26px rgba(30, 41, 59, 0.06)',
+    transition: 'all 0.25s ease',
+  },
+  routeCardHover: {
+    transform: 'translateY(-6px)',
+    boxShadow: '0 20px 36px rgba(30, 41, 59, 0.14)',
+  },
+  routeImgWrap: {
+    width: '100%',
+    height: 170,
+  },
+  routeImg: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  routeBody: {
+    padding: '18px 20px 22px',
+    textAlign: 'left',
+  },
+  routeName: {
+    fontSize: 17,
+    fontWeight: 800,
+    color: '#1E293B',
+    marginBottom: 4,
+  },
+  routePath: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.accent,
+    marginBottom: 10,
+  },
+  routeDuration: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    fontSize: 13,
+    color: colors.subtext,
+    fontWeight: 600,
+    marginBottom: 16,
+  },
+  checkSeatsBtn: {
+    width: '100%',
+    padding: '11px 0',
+    borderRadius: 14,
+    border: 'none',
+    backgroundColor: colors.accent,
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'all 0.25s ease',
+    boxShadow: '0 8px 18px rgba(37, 99, 235, 0.22)',
+  },
+  checkSeatsBtnHover: {
+    transform: 'translateY(-3px) scale(1.02)',
+    boxShadow: '0 14px 24px rgba(37, 99, 235, 0.32)',
+  },
+
+  // FEATURES
+  featureGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: 28,
+  },
+  featureCard: {
+    backgroundColor: colors.card,
+    borderRadius: 22,
+    padding: '28px 24px',
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 10px 26px rgba(30, 41, 59, 0.05)',
+    textAlign: 'left',
+    transition: 'all 0.25s ease',
+  },
+  featureCardHover: {
+    transform: 'translateY(-6px) scale(1.02)',
+    boxShadow: '0 20px 36px rgba(30, 41, 59, 0.12)',
+  },
+  featureIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: colors.accentSoft,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  featureTitle: {
+    fontSize: 18,
+    fontWeight: 800,
+    color: '#1E293B',
+    marginBottom: 8,
+  },
+  featureDesc: {
+    fontSize: 14,
+    color: colors.subtext,
+    lineHeight: 1.6,
+  },
+
+  // FOOTER
+  footer: {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '28px 48px',
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: 600,
+    color: colors.subtext,
+    borderTop: `1px solid ${colors.border}`,
+    backgroundColor: colors.card,
   },
 };
 
